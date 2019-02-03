@@ -1,0 +1,25 @@
+---
+title: "Red-list African elephant dynamics"
+author: "Charles T T Edwards (NIWA, Wellington, New Zealand)"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: no
+vignette: >
+  %\VignetteIndexEntry{red}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.path = 'fig/red-', fig.width = 6, tidy = TRUE, tidy.opts = list(blank = TRUE, width.cutoff = 95), message = FALSE, warning = FALSE, collapse = TRUE, comment = "#>")
+```
+
+```{r}
+library(red)
+```
+
+# Introduction
+
+Start here....

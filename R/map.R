@@ -36,7 +36,7 @@
 	out <- vector('list', 3)
 	names(out) <- c('estimate', 'sd', 'quantiles')
 	
-	if ("theta_tilde" %in% names(object)) { ERROR <- TRUE
+	if ("theta_tilde" %in% names(object) & dim(object$theta_tilde)[1] > 1) { ERROR <- TRUE
 	} else { ERROR <- FALSE }
 	    
     if (missing(pars)) {

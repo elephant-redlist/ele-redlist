@@ -1,4 +1,3 @@
-inst/doc
 data-raw/*.csv
 vignettes/fig
 vignettes/*.R

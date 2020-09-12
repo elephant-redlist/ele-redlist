@@ -5,7 +5,5 @@ vignettes/.build.timestamp
 man/*.Rd
 *.Rproj
 .Rproj.user
-*.rda
-*.Rdata
 *.zip
 *.tar.gz

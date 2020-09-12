@@ -1,6 +1,6 @@
 ---
 title: "Red-list African elephant dynamics"
-author: "Charles T T Edwards (NIWA, Wellington, New Zealand)"
+author: "Charles T T Edwards (Wellington, New Zealand)"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -14,12 +14,29 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.path = 'fig/red-', fig.width = 6, tidy = TRUE, tidy.opts = list(blank = TRUE, width.cutoff = 95), message = FALSE, warning = FALSE, collapse = TRUE, comment = "#>")
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r}
 library(red)
+
+data(forest)
+
+load("inputs_forest.rda")
 ```
 
 # Introduction
 
-Start here....
+```{r}
+reg <- stan_model(model_code = model_code("slope"), model_name = "log-linear")
+
+# get initial values
+ini <- list(x0_log = rep(-1, sum(S)), 
+            alpha0 = 0,
+            alphaC = rep(0, C),
+            alphaS = rep(0, sum(S)),
+            sigma = 1, tau = c(0.1,0.1))
+
+#reg_map <- optimizing(reg, reg_dat, init = function() ini, verbose = TRUE, as_vector = FALSE)
+
+```

@@ -1,5 +1,5 @@
 inst/doc
-data-raw/
+data-raw/*.csv
 vignettes/fig
 vignettes/*.R
 vignettes/.build.timestamp

@@ -241,7 +241,8 @@ write.csv(dat, file = file.path("../data-raw", "GLOBAL_AED_1979_2016.csv"), row.
 Save to package data
 ```{r, echo = TRUE}
 # save clean data
-save(dat, file = file.path("../data", "AED.rda"))
+AED <- dat
+save(AED, file = file.path("../data", "AED.rda"))
 ```
 
 

@@ -1,4 +1,5 @@
 inst/doc
+data-raw/
 vignettes/fig
 vignettes/*.R
 vignettes/.build.timestamp

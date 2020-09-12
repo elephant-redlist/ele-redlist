@@ -90,7 +90,6 @@ for (i in countries) {
 
 # extract ordered vector of zones
 zones <- as.character(unlist(zones_per_country))
-start <- start[zones]
 
 # dimensions
 N <- nrow(dat)
@@ -211,7 +210,6 @@ for (i in countries) {
 
 # extract ordered vector of zones
 zones <- as.character(unlist(zones_per_country))
-start <- start[zones]
 
 # dimensions
 N <- nrow(dat)

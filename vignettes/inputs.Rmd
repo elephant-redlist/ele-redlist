@@ -27,11 +27,7 @@ Load data and subset.
 ```{r}
 data(AED, package = "red")
 
-dat <- dat[, c('region', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys')]
-```
-
-```{r}
-dat_global <- dat
+dat_global <- AED[, c('region', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys')]
 ```
 
 # Forest
@@ -140,18 +136,21 @@ for (i in 1:sum(S)) {
 }
 
 # save all data
-filename <- "inputs_forest.rda"
-save(dat, X, years, year_labels, zones, areas, start, countries, zones_per_country, number_zones_per_country, N, Y, S, C, file = filename)
+#filename <- "inputs_forest.rda"
+#save(dat, X, years, year_labels, zones, areas, start, countries, zones_per_country, number_zones_per_country, N, Y, S, C, file = filename)
+
+inputs_forest <- dat
+save(inputs_forest, file = "../data/inputs_forest.rda")
 
 # save regression input data
-reg_dat <- list(N = N, Y = Y, S = S, C = C, XY = X$Y, XC = X$C, XS = X$S,
+forest <- list(N = N, Y = Y, S = S, C = C, XY = X$Y, XC = X$C, XS = X$S,
                 y = dat$density, 
                 start = start,
                 survey_area = t(areas), 
                 range_area = modal_areas$max_modal_survey_area,
                 use_relative_survey_area = FALSE)
                 
-save(reg_dat, file = "../data/forest.rda")
+save(forest, file = "../data/forest.rda")
 ```
 
 # Savannah
@@ -260,20 +259,23 @@ for (i in 1:sum(S)) {
 }
 
 # save all data
-filename <- "inputs_savannah.rda"
-save(dat, X, years, year_labels, zones, areas, start, countries, zones_per_country, number_zones_per_country, N, Y, S, C, file = filename)
+#filename <- "inputs_savannah.rda"
+#save(dat, X, years, year_labels, zones, areas, start, countries, zones_per_country, number_zones_per_country, N, Y, S, C, file = filename)
+
+inputs_savannah <- dat
+save(inputs_savannah, file = "../data/inputs_savannah.rda")
 ```
 
 ```{r}
 # save regression input data
-reg_dat <- list(N = N, Y = Y, S = S, C = C, XY = X$Y, XC = X$C, XS = X$S,
+savannah <- list(N = N, Y = Y, S = S, C = C, XY = X$Y, XC = X$C, XS = X$S,
                 y = dat$density, 
                 start = start,
                 survey_area = t(areas), 
                 range_area = modal_areas$max_modal_survey_area,
                 use_relative_survey_area = FALSE)
                 
-save(reg_dat, file = "../data/savannah.rda")
+save(savannah, file = "../data/savannah.rda")
 ```
 
 

@@ -33,18 +33,19 @@ reg_lp <- stan_model(model_code = model_code("poly"),  model_name = "log-polynom
 
 ```{r}
 data(forest)
+data(inputs_forest)
 ```
 
 ## Log-linear model fit
 ```{r}
 # get initial values
-ini <- with(reg_dat, list(x0_log = rep(-1, sum(S)), 
+ini <- with(forest, list(x0_log = rep(-1, sum(S)), 
             alpha0 = 0,
             alphaC = rep(0, C),
             alphaS = rep(0, sum(S)),
             sigma = 1, tau = c(0.1,0.1)))
 
-reg_map <- optimizing(reg_ll, reg_dat, init = function() ini, as_vector = FALSE)
+reg_map <- optimizing(reg_ll, forest, init = function() ini, as_vector = FALSE)
 
 reg_ini         <- list()
 reg_ini$x0_log  <- reg_map$pars$x0_log
@@ -57,7 +58,7 @@ reg_ini$tau     <- c(0.1,0.1)
 
 ```{r, results = 'hide'}
 # MCMC sampling
-reg_ll_out <- sampling(reg_ll, data = reg_dat, init = function() reg_ini, chains = 2) 
+reg_ll_out <- sampling(reg_ll, data = forest, init = function() reg_ini, chains = 2) 
 ```
 
 ```{r, echo = FALSE}
@@ -68,9 +69,9 @@ print(gg)
 ```
 
 ```{r, echo = FALSE}
-dat$density_sim <- posterior(reg_ll_out, "y_sim", fun = "median")[[1]]
+inputs_forest$density_sim <- posterior(reg_ll_out, "y_sim", fun = "median")[[1]]
 
-gg <- ggplot(dat) + 
+gg <- ggplot(inputs_forest) + 
     geom_point(aes(x = density, y = density_sim)) + 
     facet_wrap(~country) +
     labs(x = "Observed", y = "Predicted") + 
@@ -84,7 +85,7 @@ print(gg)
 ## Log-polynomial model fit
 ```{r}
 # get initial values
-ini <- with(reg_dat, list(x0_log = rep(-1, sum(S)), 
+ini <- with(forest, list(x0_log = rep(-1, sum(S)), 
             alpha0 = 0,
             alphaC = rep(0, C),
             alphaS = rep(0, sum(S)),
@@ -93,7 +94,7 @@ ini <- with(reg_dat, list(x0_log = rep(-1, sum(S)),
             betaS = rep(0, sum(S)),
             sigma = 1, tau = c(0.1,0.1,0.1,0.1)))
 
-reg_map <- optimizing(reg_lp, reg_dat, init = function() ini, as_vector = FALSE)
+reg_map <- optimizing(reg_lp, forest, init = function() ini, as_vector = FALSE)
 
 reg_ini         <- list()
 reg_ini$x0_log  <- reg_map$pars$x0_log
@@ -109,7 +110,7 @@ reg_ini$tau     <- c(0.1,0.1,0.1,0.1)
 
 ```{r, results = 'hide'}
 # MCMC sampling
-reg_lp_out <- sampling(reg_lp, data = reg_dat, init = function() reg_ini, chains = 2) 
+reg_lp_out <- sampling(reg_lp, data = forest, init = function() reg_ini, chains = 2) 
 ```
 
 ```{r, echo = FALSE}
@@ -120,9 +121,9 @@ print(gg)
 ```
 
 ```{r, echo = FALSE}
-dat$density_sim <- posterior(reg_lp_out, "y_sim", fun = "median")[[1]]
+inputs_forest$density_sim <- posterior(reg_lp_out, "y_sim", fun = "median")[[1]]
 
-gg <- ggplot(dat) + 
+gg <- ggplot(inputs_forest) + 
     geom_point(aes(x = density, y = density_sim)) + 
     facet_wrap(~country) +
     labs(x = "Observed", y = "Predicted") + 

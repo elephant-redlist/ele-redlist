@@ -235,7 +235,7 @@ generated quantities {
  	{
 		int k = 0;
         
-        real T = Y - start[1];
+        real T = Y - start;
         real Tplus = T * (T + 1) / 2.0;
         
         real site_weight_sum = 0.0;

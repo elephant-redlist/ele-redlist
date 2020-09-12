@@ -1,11 +1,11 @@
 Package: red
 Type: Package
 Title: Red-list African elephant dynamics
-Version: 0.0.0.1090
-Date: 2020-09-02
+Version: 0.0.0.1092
+Date: 2020-09-12
 Author: Charles T T Edwards
-Maintainer: Charles T T Edwards <charles.edwards@niwa.co.nz>
-Description: Estimates African elephant population dynamics using a two-part regression fitted to survey data and mortality covariates.
+Maintainer: Charles T T Edwards <cescapecs@gmail.com>
+Description: Estimates African elephant population dynamics at the continental scale using a regression fitted to survey data.
 License: GPL (>=3)
 LazyData: true
 VignetteBuilder: knitr
@@ -18,8 +18,8 @@ Depends:
 Imports:
     methods
 Collate: 
-    'change.R'
     'fill.R'
+    'label.R'
     'map.R'
     'mode.R'
     'model_code.R'

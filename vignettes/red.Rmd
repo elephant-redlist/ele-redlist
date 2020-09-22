@@ -32,8 +32,7 @@ reg_lp <- stan_model(model_code = model_code("poly"),  model_name = "log-polynom
 # Forest
 
 ```{r}
-data(forest)
-data(inputs_forest)
+data(forest, package = "redData")
 ```
 
 ## Log-linear model fit
@@ -69,9 +68,9 @@ print(gg)
 ```
 
 ```{r, echo = FALSE}
-inputs_forest$density_sim <- posterior(reg_ll_out, "y_sim", fun = "median")[[1]]
+dat$density_sim <- posterior(reg_ll_out, "y_sim", fun = "median")[[1]]
 
-gg <- ggplot(inputs_forest) + 
+gg <- ggplot(dat) + 
     geom_point(aes(x = density, y = density_sim)) + 
     facet_wrap(~country) +
     labs(x = "Observed", y = "Predicted") + 
@@ -121,9 +120,9 @@ print(gg)
 ```
 
 ```{r, echo = FALSE}
-inputs_forest$density_sim <- posterior(reg_lp_out, "y_sim", fun = "median")[[1]]
+dat$density_sim <- posterior(reg_lp_out, "y_sim", fun = "median")[[1]]
 
-gg <- ggplot(inputs_forest) + 
+gg <- ggplot(dat) + 
     geom_point(aes(x = density, y = density_sim)) + 
     facet_wrap(~country) +
     labs(x = "Observed", y = "Predicted") + 

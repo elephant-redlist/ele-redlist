@@ -4,7 +4,7 @@ DATE    <- Sys.Date()
 TIME    <- Sys.time()
 
 # increment development version
-VERSION <- paste(substr(VERSION, start = 1, stop = 6), as.numeric(substr(VERSION, start = 7, stop = 10)) + 1, sep = '')
+VERSION <- paste(substr(VERSION, start = 1, stop = 4), as.numeric(substr(VERSION, start = 5, stop = 10)) + 1, sep = '')
 
 # update DESCRIPTION
 DESCRIPTION    <- readLines('DESCRIPTION')

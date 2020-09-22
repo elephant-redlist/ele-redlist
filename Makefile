@@ -22,7 +22,7 @@ all: document install clean
 	$(CD) vignettes; Rcmd Sweave red.Rmd
 	$(CP) ./vignettes/*.html ./inst/doc/
     
-install: $(PKG_FILES) ./inst/doc/*.html ./data/*.rda
+install: $(PKG_FILES) ./inst/doc/*.html
 	Rcmd build --no-build-vignettes .
 	Rcmd INSTALL $(PKG_NAME)_*.tar.gz
     

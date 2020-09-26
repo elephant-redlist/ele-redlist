@@ -288,7 +288,7 @@ abline(0,1)
 
 From the table we can extract an estimate of the decline:
 ```{r}
-with(dfr, sum(N_1984 * decline) / sum(N_1984))
+with(dfr, sum(N_1965 * decline) / sum(N_1965))
 ```
 
 and tabulate the results:

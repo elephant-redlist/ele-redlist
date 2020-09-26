@@ -287,6 +287,7 @@ generated quantities {
         
         MPE += y[i] > 0.0 ? fabs(y_sim[i] - y[i]) / y[i] : 0.0;
     }
+    MPE /= N;
 	
 	// SUMMARY STATISTICS FOR TRACE DIAGNOSTICS
 	parameter_summary[1] = vector_norm(x0_log);

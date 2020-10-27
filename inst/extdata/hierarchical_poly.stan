@@ -11,8 +11,8 @@
 // OBSERVATIONAL DATA
 // y: observed densities
 // COVARIATES
-// r: intrinsic growth rate
-// area: area size per site or zone
+// survey_area: survey area per year
+// range_area: assumed range area across years
 
 functions {
 	

@@ -4,15 +4,15 @@
 // DIMENSIONS
 // C: number of countries
 // N: number of records
-// S: number of sites or zones per country
+// S: number of sites per country
 // Y: number of years
 // LOOK-UP VECTORS
 // XY; XC; XS
 // OBSERVATIONAL DATA
 // y: observed densities
 // COVARIATES
-// r: intrinsic growth rate
-// area: area size per site or zone
+// survey_area: survey area per year
+// range_area: assumed range area across years
 
 functions {
 	

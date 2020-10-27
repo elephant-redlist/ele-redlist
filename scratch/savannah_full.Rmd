@@ -160,11 +160,56 @@ gg <- ggplot(dfr) +
 print(gg)
 ```
 
-# Trend estimate as the numbers weighted average decline
+# Trend estimates
 
-Estimation of the decline as an arithmetic average is presented to adhere with the IUCN Red List assessment criteria. The IUCN criteria stipulates that a numbers weighted average of the decline per site is required for Red List Assessments.
+## Expected posterior decline
+The model is constructed under an assumption that each site represents a random sample of the decline from a panmitic population with correlated dynamics between sites. This allows information to be shared across sites in a statistically coherent manner (and is necessary given the low number of surveys per site). The decline is extracted from the model by integrating across sites to obtain an expectation across the population. The result is ecologically relevant, since each site across the whole population contributes to the estimated decline. The contribution of each site to the final estimate is in proportion to the information content of the data at that site.
 
-An absence of data estimating the numbers at each site at a common reference point in time makes this difficult (i.e., surveys were conducted erratically across Africa). As a result, to apply this method, the density derived from site level trends is converted into a numbers estimate using a static, assumed range area obtained from the modal survey area at that site. This survey area, as recorded in the data, is determined by a variety of factors, including expert opinion of range size and logistical practicalities of the survey. Therefore, it is unknown how closely the modal survey area represents the true range size for many sites. Furthermore, given that elephant ranges are known to have changed, a static range size is likely unrealistic for many of the sites. Converting density into numbers is therefore difficult and represents an approximation.
+The decline is esimated as:
+$$
+\mathrm{decline} = 1 - \exp(\alpha_0 \cdot T + \tau^2 / 2)
+$$
+where $\alpha_0$ is the intercept of the growth rates per site, $T$ is the number of years over which the decline is being estimated and $\tau^2$ is the variance of the declines per site. 
+
+The posterior distribution of the expected decline is:
+
+```{r}
+dfr <- posterior(reg_ll_out, pars = "expected_decline", melt = TRUE)[[1]]
+
+gg <- ggplot(dfr) + 
+  geom_histogram(aes(value, ..density..), binwidth = 0.1) +
+  theme_bw(base_size = 20) %+replace% theme(axis.text.y = element_blank()) +
+  scale_x_continuous(limits = c(-0.5, 1.2)) +
+  labs(x = "Posterior Decline", y = "") +
+  geom_vline(xintercept = c(0.2, 0.5, 0.8, 1.0), col = "red")
+print(gg)
+```
+
+We can plot the distribution of growth rates per site ($\alpha_0 + \varepsilon_{i}$, where $\varepsilon_i$ is a random effect per site):
+```{r, echo = TRUE, fig.height=10}
+gg <- plot(reg_ll_out, pars = "alpha_re") + theme(axis.text.y = element_blank()) + ggtitle("Growth rate per site")
+gg <- gg + geom_vline(xintercept = posterior(reg_ll_out, "alpha0", fun = "median")[[1]], col = "blue", size = 2, alpha = 0.6)
+print(gg)
+
+```
+
+and tabulate the results:
+```{r, echo = TRUE, results = "asis"}
+dfr <- posterior(reg_ll_out, pars = "expected_decline", melt = TRUE)[[1]]
+  
+ff <- function(x) paste0(round(median(x, na.rm = TRUE), 2), " (", round(quantile(x, 0.025, na.rm = TRUE), 2), " - ", round(quantile(x, 0.975, na.rm = TRUE), 2), ")")
+
+out <-  with(dfr, data.frame(
+             decline = ff(value), 
+             critical   = round(mean(value > 0.8),2), 
+             endangered = round(mean(value <= 0.8 & value > 0.5),2), 
+             vulnerable = round(mean(value <= 0.5 & value > 0.2),2), 
+             not_threatened = round(mean(value <= 0.2),2)))
+pandoc.table(out, style = "rmarkdown")
+```
+
+## Numbers weighted average decline
+Estimation of the decline as an arithmetic average is presented to adhere with the IUCN Red List assessment criteria. Creating an arithmetic average of the decline across sites is equivalent to assuming that each site represents an independent population i.e. a fixed effect. This is inconsistent with how the model is constructed, whereby information is shared across sites in the same country. Further, this assumption is unlikely to be true biologically because of shared characteristics of each population (environmental and anthropogenic) and, in some cases, movement between sites. The IUCN criteria stipulates that a numbers weighted average of the decline per site is required for Red List Assessments. However, an absence of data estimating the numbers at each site at a common reference point in time makes this difficult (i.e., surveys were conducted erratically across Africa). As a result, to apply this method, the density derived from site level trends is converted into a numbers estimate using a static, assumed range area obtained from the modal survey area at that site (despite the fact that site level survey area often varies over time). This survey area, as recorded in the data, is determined by a variety of factors, including expert opinion of range size and logistical practicalities of the survey.  Therefore, it is unknown how closely the modal survey area represents the true range size for many sites. Furthermore, given that elephant ranges are known to have changed, a static range size is likely unrealistic for many of the sites. Converting density into numbers is therefore difficult and represents an approximation. In summary, creating a numbers weighted average relies on imperfect metrics (i.e., survey area) and will be biased towards the populations assumed to be largest. While we recognize the latter is the aim of the IUCN Red List criteria (trends based on numbers rather than extant populations), this means ecological extinction could occur across much of the populations range and yet this method could still return an optimistic result if a single large and increasing population dominates.
 
 The numbers per site is obtained from model estimates of the log-density $x$ at site $i$ and time $t$, the observation error variance per site $\sigma^2$, the assumed range area size $a_i$ and the maximum likelihood estimate of the probability of a positive survey $\theta_i$ (typically close to one):
 $$
@@ -201,7 +246,7 @@ gg <- gg + geom_vline(xintercept = posterior(reg_ll_out, "decline", fun = "media
 print(gg)
 ```
 
-It is requested that this assessment includes a table of the declines per site, in this case taking median values per site:
+Assuming a numbers weighted average of the decline per site it is relevant to generate a table of the declines per site, in this case taking median values per site:
 ```{r, results = "asis"}
 year_N0 <- 1965
 

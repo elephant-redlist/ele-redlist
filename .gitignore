@@ -7,4 +7,4 @@ man/*.Rd
 .Rproj.user
 *.zip
 *.tar.gz
-^scratch/*
+scratch/*

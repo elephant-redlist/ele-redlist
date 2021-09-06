@@ -6,7 +6,7 @@ pandoc: false
 latex: false
 
 r_packages:
-    - dplyr
+    - plyr
     - usethis
     - roxygen2
     

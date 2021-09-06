@@ -23,6 +23,8 @@ Depends:
 	rstan (>= 2.21.0)
 Imports:
     methods
+Remotes:
+    cttedwards/redData
 Collate: 
     'label.R'
     'map.R'

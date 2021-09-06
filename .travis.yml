@@ -2,16 +2,13 @@ language: r
 os: linux
 warnings_are_errors: false
 cache: packages
-pandoc: false
 latex: false
 
 r_packages:
     - plyr
     - usethis
     - roxygen2
-    
-r_github_packages:
-  - cttedwards/redData
+    - remotes
 
 apt_packages:
   - libudunits2-dev
@@ -21,6 +18,7 @@ apt_packages:
   - libv8-dev
   
 script:
+    - Rscript -e "remotes::install_github('cttedwards/redData', build_vignettes = TRUE, force = TRUE)"
     - R CMD build .
 
 repos:

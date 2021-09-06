@@ -10,6 +10,7 @@ License: GPL (>=3)
 LazyData: true
 VignetteBuilder: knitr
 Suggests:
+    markdown,
     Pandoc (>= 1.12.3),
     rmarkdown (>= 2.6),
     knitr (>= 1.31),

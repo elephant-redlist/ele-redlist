@@ -1,4 +1,4 @@
-Red-list elephant dynamics
+Red-list elephant dynamics  <img src='african-elephant.jpg' align="right" height="120" />
 ===========================
 
 [![Build Status](https://app.travis-ci.com/cttedwards/red.svg?token=oxZdiRsNesp8jgJE5pF3&branch=master)](https://app.travis-ci.com/cttedwards/red)

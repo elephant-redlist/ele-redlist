@@ -10,13 +10,14 @@ License: GPL (>=3)
 LazyData: true
 VignetteBuilder: knitr
 Suggests:
-    markdown,
-    pander,
     Pandoc (>= 1.12.3),
+    markdown,
     rmarkdown (>= 2.6),
     knitr (>= 1.31),
     ggplot2 (>= 3.3.3),
-    formatR (>= 1.00)
+    plyr (>= 1.8.0),
+    formatR (>= 1.00),
+    reshape2 (>= 1.4.0)
 Depends:
     R (>= 4.0.0),
 	rstan (>= 2.21.0)

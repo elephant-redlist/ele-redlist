@@ -11,6 +11,7 @@ LazyData: true
 VignetteBuilder: knitr
 Suggests:
     markdown,
+    pander,
     Pandoc (>= 1.12.3),
     rmarkdown (>= 2.6),
     knitr (>= 1.31),

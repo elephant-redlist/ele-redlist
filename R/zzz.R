@@ -1,4 +1,4 @@
 .onAttach <- function(libname, pkgname)
 {
-    packageStartupMessage("red version 0.0.1 (2020-09-22 18:24:02)")
+    packageStartupMessage("red version 0.0.2 (2021-09-05 19:47:01)")
 }

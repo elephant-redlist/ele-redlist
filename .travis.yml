@@ -1,0 +1,27 @@
+language: r
+os: linux
+warnings_are_errors: false
+cache: packages
+pandoc: false
+latex: false
+
+r_packages:
+    - dplyr
+    - usethis
+    - roxygen2
+    
+r_github_packages:
+  - cttedwards/redData
+
+apt_packages:
+  - libudunits2-dev
+  - libgdal-dev
+  - libgeos-dev
+  - libproj-dev
+  - libv8-dev
+  
+script:
+    - R CMD build .
+
+repos:
+  CRAN: https://cran.rstudio.com

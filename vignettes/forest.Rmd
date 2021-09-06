@@ -114,28 +114,28 @@ reg_ini$tau     <- c(0.1,0.1,0.1,0.1)
 
 ```{r, results = 'hide'}
 # MCMC sampling
-reg_lp_out <- sampling(reg_lp, data = forest, init = function() reg_ini, chains = 2) 
+#reg_lp_out <- sampling(reg_lp, data = forest, init = function() reg_ini, chains = 2) 
 ```
 
 ```{r, echo = FALSE, fig.width=10, fig.height=10}
-gg <- traceplot(reg_lp_out, pars = c("parameter_summary", "error_summary", "output_summary"))
-gg <- gg + facet_wrap(~parameter, scales = "free_y") + theme_bw(base_size = 12) + guides(col = "none")
-gg <- gg + ggtitle("Trace summary statistics")
-print(gg)
+#gg <- traceplot(reg_lp_out, pars = c("parameter_summary", "error_summary", "output_summary"))
+#gg <- gg + facet_wrap(~parameter, scales = "free_y") + theme_bw(base_size = 12) + guides(col = "none")
+#gg <- gg + ggtitle("Trace summary statistics")
+#print(gg)
 ```
 
 ```{r, echo = FALSE, fig.width=10, fig.height=10}
-dat$density_sim <- posterior(reg_lp_out, "y_sim", fun = "median")[[1]]
-
-gg <- ggplot(dat) + 
-    geom_point(aes(x = density, y = density_sim)) + 
-    facet_wrap(~country) +
-    labs(x = "Observed", y = "Predicted") + 
-    geom_abline(intercept = 0, slope = 1) +
-    theme_bw(base_size = 14) +
-    scale_y_log10() + scale_x_log10() +
-    ggtitle("Posterior prediction of survey density data")
-print(gg)
+#dat$density_sim <- posterior(reg_lp_out, "y_sim", fun = "median")[[1]]
+#
+#gg <- ggplot(dat) + 
+#    geom_point(aes(x = density, y = density_sim)) + 
+#    facet_wrap(~country) +
+#    labs(x = "Observed", y = "Predicted") + 
+#    geom_abline(intercept = 0, slope = 1) +
+#    theme_bw(base_size = 14) +
+#    scale_y_log10() + scale_x_log10() +
+#    ggtitle("Posterior prediction of survey density data")
+#print(gg)
 ```
 
 ## Compare predictions
@@ -147,16 +147,16 @@ $$
 where $y_i$ is the observation and $\hat{y}_i$ is the posterior predicted value. Because the MPE distributions are similar between the two model fits we conclude that the polynomial model does not provide any improvement in terms of predictive ability, and select the log-linear model as the most parsimonious representation of the data. This is supported by visual inspection of the trace diagnostics, which show slower convergence for the more complicated (log-polynomial) model.
 
 ```{r}
-dfr_ll <- posterior(reg_ll_out, pars = "MPE", melt = TRUE)[[1]]
-dfr_lp <- posterior(reg_lp_out, pars = "MPE", melt = TRUE)[[1]]
-
-dfr <- merge(dfr_ll, dfr_lp, by = "iterations", suffixes = c(".ll", ".lp"))
-dfr <- reshape2::melt(dfr, id.vars = "iterations")
-
-gg <- ggplot(dfr) +
-    geom_density(aes(value, fill = variable), alpha = 0.3) + labs(x = "Mean absolute prediction error", y = "") +
-    theme_bw(base_size = 16)
-print(gg)
+#dfr_ll <- posterior(reg_ll_out, pars = "MPE", melt = TRUE)[[1]]
+#dfr_lp <- posterior(reg_lp_out, pars = "MPE", melt = TRUE)[[1]]
+#
+#dfr <- merge(dfr_ll, dfr_lp, by = "iterations", suffixes = c(".ll", ".lp"))
+#dfr <- reshape2::melt(dfr, id.vars = "iterations")
+#
+#gg <- ggplot(dfr) +
+#    geom_density(aes(value, fill = variable), alpha = 0.3) + labs(x = "Mean absolute prediction error", y = "") +
+#    theme_bw(base_size = 16)
+#print(gg)
 ```
 
 # Trend estimate as the numbers weighted average decline

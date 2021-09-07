@@ -2,7 +2,7 @@ language: r
 os: linux
 warnings_are_errors: false
 cache: packages
-latex: false
+latex: true
 
 r_packages:
     - plyr

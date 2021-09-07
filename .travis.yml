@@ -19,7 +19,7 @@ apt_packages:
   
 script:
     - Rscript -e "remotes::install_github('cttedwards/redData', build_vignettes = TRUE, force = TRUE)"
-    - travis_wait 60 R CMD build .
+    - R CMD build --no-build-vignettes .
 
 repos:
   CRAN: https://cran.rstudio.com

@@ -9,6 +9,10 @@
 #' @param melt      logical value indicating whether output arrays should be converted to long format using \code{rehape2::melt.array()}
 #' @param fun       one of either "mean", "median" or "quantiles", which will be calculated across iterations if supplied.
 #' 
+#' @importFrom stats median
+#' @importFrom stats sd
+#' @importFrom stats quantile
+#' 
 #' @return Returns a list of posterior samples for each parameter. If \code{melt = TRUE} then these are returned as data.frames, otherwise they are arrays. If \code{fun} is specificed then the output is summarised across iterations.
 #'
 #' @examples 

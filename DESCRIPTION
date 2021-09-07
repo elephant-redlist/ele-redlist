@@ -1,8 +1,8 @@
 Package: red
 Type: Package
 Title: Red-list African elephant dynamics
-Version: 0.0.2
-Date: 2021-09-05
+Version: 0.0.3
+Date: 2021-09-07
 Author: AERL assessment team
 Maintainer: Charles T T Edwards <cescapecs@gmail.com>
 Description: Estimates African elephant population dynamics at the continental scale using a regression fitted to survey data.
@@ -10,7 +10,6 @@ License: GPL (>=3)
 LazyData: true
 VignetteBuilder: knitr
 Suggests:
-    Pandoc (>= 1.12.3),
     markdown,
     rmarkdown (>= 2.6),
     knitr (>= 1.31),

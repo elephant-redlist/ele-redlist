@@ -15,6 +15,10 @@
 #' 
 #' @note This function uses regular expression matching to find the parameter values in the returned object from \code{\link[rstan]{optimizing}}.
 #'
+#' @importFrom stats median
+#' @importFrom stats sd
+#' @importFrom stats quantile
+#'
 #' @examples
 #' require(rstan)
 #' 

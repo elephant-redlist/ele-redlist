@@ -29,7 +29,7 @@
 #' cbind(x = x, x_sim = summary(mdl.map, pars = "x_sim")[[1]][, "mean"])
 #'
 #' @export
-"summary.map" <- function(object, pars) {
+"summary.map" <- function(object, pars, ...) {
     
     if (missing(pars)) {
         

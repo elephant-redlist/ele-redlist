@@ -18,8 +18,9 @@ apt_packages:
   - libv8-dev
   
 script:
-    - Rscript -e "remotes::install_github('cttedwards/redData', build_vignettes = TRUE, force = TRUE)"
+    - Rscript -e "remotes::install_github('cttedwards/redData', build_vignettes = TRUE)"
     - R CMD build --no-build-vignettes .
+    - R CMD check .
 
 repos:
   CRAN: https://cran.rstudio.com

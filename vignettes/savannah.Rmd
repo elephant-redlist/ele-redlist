@@ -30,7 +30,7 @@ library(red)
 reg_ll <- stan_model(model_code = model_code("slope"), model_name = "log-linear")
 ```
 
-Data are stored in the \code{redData} auxilliary package.
+Data are stored in the \code{redData} auxiliary package.
 
 ```{r}
 data(savannah, package = "redData")

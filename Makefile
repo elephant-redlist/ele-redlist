@@ -26,9 +26,6 @@ install: $(PKG_FILES)
 	$(RM) $(PKG_NAME)_*.tar.gz
 	Rcmd build --no-build-vignettes .
 	Rcmd INSTALL $(PKG_NAME)_*.tar.gz
-    
-#document:
-#    Rscript -e "roxygen2::roxygenise()"
 	
 DESCRIPTION NAMESPACE: $(R_FILES)
 	Rscript -e "roxygen2::roxygenise()"

@@ -5,13 +5,10 @@
 #' 
 #' @param object    output from call to \code{\link[rstan]{sampling}}.
 #' @param pars      character vector of posterior parameter samples to be extracted.
-#' @param dim.names optional list of named lists containing dimension names for each parameter, including the number of iterations over the first dimension. If only a single \code{list(list())} entry is given it is applied to all parameters. Not all parameters need to be provided with dimension names.
+#' @param dim.names optional list of named lists containing dimension names for each parameter. If only a single \code{list(list())} entry is given it is applied to all parameters. Not all parameters need to be provided with dimension names.
 #' @param melt      logical value indicating whether output arrays should be converted to long format using \code{rehape2::melt.array()}
 #' @param fun       one of either "mean", "median" or "quantiles", which will be calculated across iterations if supplied.
-#' 
-#' @importFrom stats median
-#' @importFrom stats sd
-#' @importFrom stats quantile
+#' @param ...       additional arguments to function
 #' 
 #' @return Returns a list of posterior samples for each parameter. If \code{melt = TRUE} then these are returned as data.frames, otherwise they are arrays. If \code{fun} is specificed then the output is summarised across iterations.
 #'
@@ -27,6 +24,10 @@
 #' 
 #' posterior(mdl.fit, pars = c("mu", "x_sim", "x_sim_sum"), fun = "quantiles")
 #' 
+#' @importFrom stats median
+#' @importFrom stats quantile
+#' @importFrom rstan extract
+#' 
 #' @export
 "posterior" <- function(object, pars, ...) UseMethod("posterior")
 #' @rdname posterior
@@ -39,7 +40,11 @@
     
     object <- rstan::extract(object, pars = pars, permuted = TRUE, inc_warmup = FALSE)
     
+    iter <- dim(object[[1]])[1]
+    
     if (!missing(dim.names)) {
+    
+        dim.names <- lapply(dim.names, function(x) c(list(iterations = 1:iter), x))
         
         if (length(dim.names) == 1) {
             
@@ -58,15 +63,15 @@
     if (!missing(fun)) {
         
         object <- switch(fun,
-                         "median"    = lapply(object, function(x) if (length(dim(x)) > 1) apply(x, 2:length(dim(x)), median) else median(x)),
-                         "mean"      = lapply(object, function(x) if (length(dim(x)) > 1) apply(x, 2:length(dim(x)), mean) else mean(x)),
-                         "quantiles" = lapply(object, function(x) if (length(dim(x)) > 1) apply(x, 2:length(dim(x)), quantile, c(0.5, 0.025, 0.975)) else quantile(x, c(0.5, 0.025, 0.975))),
+                         "median"    = lapply(object, function(x) if (length(dim(x)) > 1) apply(x, 2:length(dim(x)), median, ...) else median(x, ...)),
+                         "mean"      = lapply(object, function(x) if (length(dim(x)) > 1) apply(x, 2:length(dim(x)), mean, ...) else mean(x, ...)),
+                         "quantiles" = lapply(object, function(x) if (length(dim(x)) > 1) apply(x, 2:length(dim(x)), quantile, c(0.5, 0.025, 0.975), ...) else quantile(x, c(0.5, 0.025, 0.975), ...)),
                          object)
     }
     
     if (!missing(melt)) {
         if (melt) {
-            object <- lapply(object, function(x) reshape2::melt(x))
+            object <- lapply(object, function(x) reshape2::melt(x, as.is = TRUE))
         }
     }
     

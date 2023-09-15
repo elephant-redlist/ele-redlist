@@ -1,6 +1,6 @@
 #' @title Calculate ELPD and WAIC
 #'
-#' @description Preferred model has the highest expected log-posterior density (ELPD) value
+#' @description Preferred model has the highest expected log-predictive density (ELPD) value and the lowest WAIC
 #'
 #' @param object log-likelihood matrix or list of matrices
 #' @param ... optional log-likelihood matrices for competing models

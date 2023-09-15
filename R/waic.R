@@ -11,31 +11,44 @@
 #' @rdname waic
 #' @export
 "waic.matrix" <- function(object, ...) {
+  
+    x <- list(object, ...)
     
-    cc <- apply(x, 2, max, na.rm = TRUE)
+    if (length(x) > 1) {
+      
+      do.call("waic", args = list(object = x))
+      
+    } else {
+      
+      x <- object
+      
+      n <- dim(x)[2]
     
-    # function to compute the log-mean-exponential
-    lme <- function(y, a, ...) a + log(mean(exp(y - a), ...))
-    
-    # log-predictive density
-    # per data point
-    lpd <- numeric(dim(x)[2])
-    
-    for (i in 1:length(lpd))
-      lpd[i] <- lme(x[,i], cc[i], na.rm = TRUE)
-    
-    # penalty
-    pwaic <- apply(x, 2, var, na.rm = TRUE)
-    
-    # expected log predictive density
-    elpd <- lpd - pwaic
-    
-    # summarise across data
-    SE   <- sqrt(length(elpd) * var(elpd))
-    elpd <- sum(elpd)
-    
-    # return
-    return(c("elpd" = round(elpd, 1), "SE_elpd" = round(SE, 1), "WAIC" = round(-2 * elpd, 1)))
+      cc <- apply(x, 2, max, na.rm = TRUE)
+      
+      # function to compute the log-mean-exponential
+      lme <- function(y, a, ...) a + log(mean(exp(y - a), ...))
+      
+      # log-predictive density
+      # per data point
+      lpd <- numeric(n)
+      
+      for (i in 1:n)
+        lpd[i] <- lme(x[,i], cc[i], na.rm = TRUE)
+      
+      # penalty
+      pwaic <- apply(x, 2, var, na.rm = TRUE)
+      
+      # expected log predictive density
+      elpd <- lpd - pwaic
+      
+      # summarise across data
+      SE   <- sqrt(n * var(elpd))
+      elpd <- sum(elpd)
+      
+      # return
+      return(c("elpd" = round(elpd, 1), "SE_elpd" = round(SE, 1), "WAIC" = round(-2 * elpd, 1)))
+    }
   }
 
 #' @export
@@ -52,14 +65,14 @@
     stop("number of data points is not equal between models")  
   }
   
+  # function to compute the log-mean-exponential
+  lme <- function(y, a, ...) a + log(mean(exp(y - a), ...))
+  
   for (j in 1:length(object)) {
     
     x <- object[[j]]
     
     cc <- apply(x, 2, max, na.rm = TRUE)
-    
-    # function to compute the log-mean-exponential
-    lme <- function(y, a, ...) a + log(mean(exp(y - a), ...))
     
     # log-predictive density
     # per data point

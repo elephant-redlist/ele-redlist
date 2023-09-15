@@ -2,7 +2,8 @@
 #'
 #' @description Preferred model has the highest expected log-posterior density (ELPD) value
 #'
-#' @param x posterior log-likelihood matrix with dimensions $iterations \times n$
+#' @param object log-likelihood matrix or list of matrices
+#' @param ... optional log-likelihood matrices for competing models
 #'
 #' @importFrom stats var
 #' 
@@ -50,7 +51,7 @@
       return(c("elpd" = round(elpd, 1), "SE_elpd" = round(SE, 1), "WAIC" = round(-2 * elpd, 1)))
     }
   }
-
+#' @rdname waic
 #' @export
 "waic.list" <- function(object, ...) {
   
@@ -121,7 +122,8 @@
     out <- plyr::ldply(z, .id = "model")
   
   } else {
-    out <- z[[1]]
+
+    out <- data.frame(c(data.frame(model = names(z)[1]), z[[1]]))
   }
   
   # return

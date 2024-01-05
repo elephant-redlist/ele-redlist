@@ -28,7 +28,6 @@ install: $(PKG_FILES)
 	Rcmd INSTALL $(PKG_NAME)_*.tar.gz
 	
 DESCRIPTION NAMESPACE: $(R_FILES)
-	Rscript -e "roxygen2::roxygenise()"
 	Rscript version_update.R
 
 clean:

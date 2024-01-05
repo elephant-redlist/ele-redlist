@@ -114,8 +114,8 @@
     
     for (k in 1:length(z)) {
     
-      z[[k]]["elpd_diff"] <- -sum(y[[1]] - y[[k]])
-      z[[k]]["SE_diff"]   <- sqrt(n * var(y[[1]] - y[[k]]))
+      z[[k]]["elpd_diff"] <- round(-sum(y[[1]] - y[[k]]), 1)
+      z[[k]]["SE_diff"]   <- round(sqrt(n * var(y[[1]] - y[[k]])), 1)
     }
     
     # create data frame

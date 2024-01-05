@@ -18,6 +18,7 @@ knitr::opts_chunk$set(fig.path = 'fig/savannah-', fig.width = 6, tidy = TRUE, ti
 options(rmarkdown.html_vignette.check_title = FALSE)
 
 suppressPackageStartupMessages(library(rstan))
+suppressPackageStartupMessages(library(ggplot2))
 options(mc.cores = parallel::detectCores())
 suppressPackageStartupMessages(library(pander))
 suppressPackageStartupMessages(library(plyr))

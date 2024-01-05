@@ -18,3 +18,6 @@ cat("{\n", file = filename, append = TRUE)
 cat(paste("    packageStartupMessage(\"red version ", VERSION, " (", DATE, ")\")\n", sep = ""), file = filename, append = TRUE)
 cat("}\n", file = filename, append = TRUE)
 rm(filename)
+
+# run roxygen
+roxygen2::roxygenise()

@@ -15,106 +15,103 @@
 
 <title>Cleaning script for AED data</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
 });
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -123,13 +120,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -335,123 +339,133 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cleaning script for AED data</h1>
 <h4 class="author">Charles T T Edwards</h4>
-<h4 class="date">25 March, 2022</h4>
+<h4 class="date">24 January, 2025</h4>
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># load data</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">load</span>(<span class="st">&quot;GLOBAL_AED_1979_2016_raw.rda&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># countries</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>countries &lt;-<span class="st"> </span><span class="kw">unique</span>(dat<span class="op">$</span>country)</span>
-<span id="cb2-3"><a href="#cb2-3"></a></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># cleaned data</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>dat_clean &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="kw">length</span>(countries))</span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="kw">names</span>(dat_clean) &lt;-<span class="st"> </span>countries</span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co"># summary table</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a>tab &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Country =</span> countries, <span class="st">`</span><span class="dt">no incomplete</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no duplicates</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no EXTR</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no E</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no averaged</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># check for unknown countries</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="cf">if</span> (<span class="kw">with</span>(dat, <span class="kw">any</span>(<span class="kw">is.na</span>(country) <span class="op">|</span><span class="st"> </span>country <span class="op">==</span><span class="st"> &quot;&quot;</span>))) {</span>
-<span id="cb3-3"><a href="#cb3-3"></a>    <span class="kw">warning</span>(<span class="st">&quot;deleting unknown countries&quot;</span>)</span>
-<span id="cb3-4"><a href="#cb3-4"></a>    dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, <span class="op">!</span><span class="kw">is.na</span>(country) <span class="op">&amp;</span><span class="st"> </span>country <span class="op">!=</span><span class="st"> &quot;&quot;</span>)</span>
-<span id="cb3-5"><a href="#cb3-5"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># loop over countries</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
-<span id="cb4-3"><a href="#cb4-3"></a></span>
-<span id="cb4-4"><a href="#cb4-4"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, country <span class="op">%in%</span><span class="st"> </span>i)</span>
-<span id="cb4-5"><a href="#cb4-5"></a></span>
-<span id="cb4-6"><a href="#cb4-6"></a>    <span class="co"># SIMPLE CHECKS FOR DATA QUALITY</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a></span>
-<span id="cb4-8"><a href="#cb4-8"></a>    <span class="co"># remove incomplete data records</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
-<span id="cb4-10"><a href="#cb4-10"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, zone <span class="op">!=</span><span class="st"> &quot;&quot;</span>)</span>
-<span id="cb4-11"><a href="#cb4-11"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr.clean, <span class="op">!</span><span class="kw">is.na</span>(density))</span>
-<span id="cb4-12"><a href="#cb4-12"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr.clean, <span class="op">!</span><span class="kw">is.na</span>(year))</span>
-<span id="cb4-13"><a href="#cb4-13"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr.clean, <span class="op">!</span><span class="kw">is.na</span>(zone))</span>
-<span id="cb4-14"><a href="#cb4-14"></a></span>
-<span id="cb4-15"><a href="#cb4-15"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
-<span id="cb4-16"><a href="#cb4-16"></a></span>
-<span id="cb4-17"><a href="#cb4-17"></a>    <span class="co"># remove duplicates</span></span>
-<span id="cb4-18"><a href="#cb4-18"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
-<span id="cb4-19"><a href="#cb4-19"></a>    dfr<span class="op">$</span>duplicate &lt;-<span class="st"> </span><span class="ot">FALSE</span></span>
-<span id="cb4-20"><a href="#cb4-20"></a>    dfr<span class="op">$</span>duplicate[<span class="kw">duplicated</span>(dfr[, <span class="kw">c</span>(<span class="st">&quot;zone&quot;</span>, <span class="st">&quot;country&quot;</span>, <span class="st">&quot;type&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;survey_area&quot;</span>)])] &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
-<span id="cb4-21"><a href="#cb4-21"></a></span>
-<span id="cb4-22"><a href="#cb4-22"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, <span class="op">!</span>duplicate)</span>
-<span id="cb4-23"><a href="#cb4-23"></a></span>
-<span id="cb4-24"><a href="#cb4-24"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
-<span id="cb4-25"><a href="#cb4-25"></a></span>
-<span id="cb4-26"><a href="#cb4-26"></a>    <span class="co"># remove extrapolations</span></span>
-<span id="cb4-27"><a href="#cb4-27"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
-<span id="cb4-28"><a href="#cb4-28"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, type <span class="op">!=</span><span class="st"> &quot;EXTR&quot;</span>)</span>
-<span id="cb4-29"><a href="#cb4-29"></a></span>
-<span id="cb4-30"><a href="#cb4-30"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">4</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
-<span id="cb4-31"><a href="#cb4-31"></a></span>
-<span id="cb4-32"><a href="#cb4-32"></a>    <span class="co"># remove low reliability surveys</span></span>
-<span id="cb4-33"><a href="#cb4-33"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
-<span id="cb4-34"><a href="#cb4-34"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, reliability <span class="op">!=</span><span class="st"> &quot;E&quot;</span>)</span>
-<span id="cb4-35"><a href="#cb4-35"></a></span>
-<span id="cb4-36"><a href="#cb4-36"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">5</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
-<span id="cb4-37"><a href="#cb4-37"></a></span>
-<span id="cb4-38"><a href="#cb4-38"></a>    <span class="co"># COMBINE SURVEYS FROM THE SAME ZONE IN THE SAME YEAR</span></span>
-<span id="cb4-39"><a href="#cb4-39"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
-<span id="cb4-40"><a href="#cb4-40"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(year, zone), summarize, <span class="dt">region =</span> <span class="kw">unique</span>(region), <span class="dt">subregion =</span> <span class="kw">unique</span>(subregion), <span class="dt">survey_area_shrinkage =</span> <span class="kw">unique</span>(survey_area_shrinkage),</span>
-<span id="cb4-41"><a href="#cb4-41"></a>        <span class="dt">reliability =</span> <span class="kw">max</span>(<span class="kw">as.character</span>(reliability)), <span class="dt">n_per_estimate =</span> <span class="kw">length</span>(estimate), <span class="dt">estimate =</span> <span class="kw">sum</span>(estimate), <span class="dt">survey_area =</span> <span class="kw">sum</span>(survey_area),</span>
-<span id="cb4-42"><a href="#cb4-42"></a>        <span class="dt">density =</span> estimate<span class="op">/</span>survey_area)</span>
-<span id="cb4-43"><a href="#cb4-43"></a></span>
-<span id="cb4-44"><a href="#cb4-44"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">6</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
-<span id="cb4-45"><a href="#cb4-45"></a></span>
-<span id="cb4-46"><a href="#cb4-46"></a>    <span class="co"># </span><span class="re">END</span><span class="co"> OF DATA QUALITY CHECKS</span></span>
-<span id="cb4-47"><a href="#cb4-47"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
-<span id="cb4-48"><a href="#cb4-48"></a></span>
-<span id="cb4-49"><a href="#cb4-49"></a>    <span class="co"># CHECK SURVEY AREA SIZES TO ENSURE THAT ONLY SURVEYS THAT COVER A SIMILAR AREA (KM2) PER ZONE ARE USED TO ESTIMATE</span></span>
-<span id="cb4-50"><a href="#cb4-50"></a>    <span class="co"># THE TREND IN DENSITY FOR THAT ZONE</span></span>
-<span id="cb4-51"><a href="#cb4-51"></a></span>
-<span id="cb4-52"><a href="#cb4-52"></a>    <span class="co"># 4. identify surveys that are 20% &#39;different&#39; from the modal area size. If any surveys in a time series are</span></span>
-<span id="cb4-53"><a href="#cb4-53"></a>    <span class="co"># different and survey is flagged as &#39;max&#39; then use max survey area for all years</span></span>
-<span id="cb4-54"><a href="#cb4-54"></a>    dfr.tmp &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(zone), summarize, <span class="dt">region =</span> region, <span class="dt">year =</span> year, <span class="dt">survey_area =</span> survey_area, <span class="dt">max_survey_area =</span> <span class="kw">rep</span>(<span class="kw">max</span>(survey_area),</span>
-<span id="cb4-55"><a href="#cb4-55"></a>        <span class="kw">length</span>(survey_area)), <span class="dt">diff_from_mode_D20 =</span> <span class="op">!</span>redData<span class="op">::</span><span class="kw">trim</span>(<span class="dt">x =</span> survey_area, <span class="dt">delta =</span> <span class="fl">0.2</span>)[[<span class="st">&quot;trim&quot;</span>]], <span class="dt">modal_survey_area =</span> <span class="kw">rep</span>(redData<span class="op">::</span><span class="kw">trim</span>(<span class="dt">x =</span> survey_area),</span>
-<span id="cb4-56"><a href="#cb4-56"></a>        <span class="dt">length =</span> <span class="kw">length</span>(survey_area)), <span class="dt">use_max =</span> <span class="kw">ifelse</span>(<span class="kw">any</span>(diff_from_mode_D20) <span class="op">&amp;</span><span class="st"> </span>survey_area_shrinkage, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>))</span>
-<span id="cb4-57"><a href="#cb4-57"></a></span>
-<span id="cb4-58"><a href="#cb4-58"></a>    dfr &lt;-<span class="st"> </span><span class="kw">merge</span>(dfr, dfr.tmp, <span class="dt">all.x =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-59"><a href="#cb4-59"></a></span>
-<span id="cb4-60"><a href="#cb4-60"></a>    <span class="co"># identify surveys that are 40% different and (for the revised density) have not had the survey area replaced by</span></span>
-<span id="cb4-61"><a href="#cb4-61"></a>    <span class="co"># the max and mark for deletion</span></span>
-<span id="cb4-62"><a href="#cb4-62"></a>    dfr.tmp &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(zone), summarize, <span class="dt">region =</span> region, <span class="dt">year =</span> year, <span class="dt">survey_area =</span> survey_area, <span class="dt">diff_from_mode_D40 =</span> <span class="op">!</span>redData<span class="op">::</span><span class="kw">trim</span>(<span class="dt">x =</span> survey_area,</span>
-<span id="cb4-63"><a href="#cb4-63"></a>        <span class="dt">delta =</span> <span class="fl">0.4</span>)[[<span class="st">&quot;trim&quot;</span>]], <span class="dt">delete_revised =</span> <span class="kw">ifelse</span>(diff_from_mode_D40 <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span>use_max, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dt">delete =</span> <span class="kw">ifelse</span>(diff_from_mode_D40,</span>
-<span id="cb4-64"><a href="#cb4-64"></a>        <span class="ot">TRUE</span>, <span class="ot">FALSE</span>))</span>
-<span id="cb4-65"><a href="#cb4-65"></a></span>
-<span id="cb4-66"><a href="#cb4-66"></a>    dfr &lt;-<span class="st"> </span><span class="kw">merge</span>(dfr, dfr.tmp, <span class="dt">all.x =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-67"><a href="#cb4-67"></a></span>
-<span id="cb4-68"><a href="#cb4-68"></a>    <span class="co"># revised survey area and density</span></span>
-<span id="cb4-69"><a href="#cb4-69"></a>    dfr<span class="op">$</span>revised_survey_area &lt;-<span class="st"> </span>dfr<span class="op">$</span>survey_area</span>
-<span id="cb4-70"><a href="#cb4-70"></a>    dfr<span class="op">$</span>revised_survey_area[dfr<span class="op">$</span>use_max] &lt;-<span class="st"> </span>dfr<span class="op">$</span>max_survey_area[dfr<span class="op">$</span>use_max]</span>
-<span id="cb4-71"><a href="#cb4-71"></a></span>
-<span id="cb4-72"><a href="#cb4-72"></a>    dfr<span class="op">$</span>revised_density &lt;-<span class="st"> </span>dfr<span class="op">$</span>estimate<span class="op">/</span>dfr<span class="op">$</span>revised_survey_area</span>
-<span id="cb4-73"><a href="#cb4-73"></a></span>
-<span id="cb4-74"><a href="#cb4-74"></a>    <span class="co"># count number surveys per zone</span></span>
-<span id="cb4-75"><a href="#cb4-75"></a>    dfr.tmp &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(zone), summarize, <span class="dt">n_surveys =</span> <span class="kw">length</span>(density))</span>
-<span id="cb4-76"><a href="#cb4-76"></a>    dfr &lt;-<span class="st"> </span><span class="kw">merge</span>(dfr, dfr.tmp, <span class="dt">by =</span> <span class="st">&quot;zone&quot;</span>, <span class="dt">all =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-77"><a href="#cb4-77"></a></span>
-<span id="cb4-78"><a href="#cb4-78"></a>    <span class="co"># FORMAT AND CHECKING</span></span>
-<span id="cb4-79"><a href="#cb4-79"></a></span>
-<span id="cb4-80"><a href="#cb4-80"></a>    <span class="co"># check</span></span>
-<span id="cb4-81"><a href="#cb4-81"></a>    <span class="kw">stopifnot</span>(<span class="kw">nrow</span>(dfr) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean))</span>
-<span id="cb4-82"><a href="#cb4-82"></a></span>
-<span id="cb4-83"><a href="#cb4-83"></a>    <span class="co"># save cleaned data</span></span>
-<span id="cb4-84"><a href="#cb4-84"></a>    dat_clean[[i]] &lt;-<span class="st"> </span>dfr</span>
-<span id="cb4-85"><a href="#cb4-85"></a></span>
-<span id="cb4-86"><a href="#cb4-86"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># load data</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;GLOBAL_AED_1979_2016_raw.rda&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># countries</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>countries <span class="ot">&lt;-</span> <span class="fu">unique</span>(dat<span class="sc">$</span>country)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># cleaned data</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>dat_clean <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="fu">length</span>(countries))</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">names</span>(dat_clean) <span class="ot">&lt;-</span> countries</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># summary table</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Country =</span> countries, <span class="st">`</span><span class="at">no incomplete</span><span class="st">`</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">`</span><span class="at">no duplicates</span><span class="st">`</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">`</span><span class="at">no EXTR</span><span class="st">`</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">`</span><span class="at">no E</span><span class="st">`</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">`</span><span class="at">no averaged</span><span class="st">`</span> <span class="ot">=</span> <span class="cn">NA</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># check for unknown countries</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">with</span>(dat, <span class="fu">any</span>(<span class="fu">is.na</span>(country) <span class="sc">|</span> country <span class="sc">==</span> <span class="st">&quot;&quot;</span>))) {</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>    <span class="fu">warning</span>(<span class="st">&quot;deleting unknown countries&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    dat <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat, <span class="sc">!</span><span class="fu">is.na</span>(country) <span class="sc">&amp;</span> country <span class="sc">!=</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># loop over countries</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat, country <span class="sc">%in%</span> i)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    <span class="co"># SIMPLE CHECKS FOR DATA QUALITY</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    <span class="co"># remove incomplete data records</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> dfr.clean</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr, zone <span class="sc">!=</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr.clean, <span class="sc">!</span><span class="fu">is.na</span>(density))</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr.clean, <span class="sc">!</span><span class="fu">is.na</span>(year))</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr.clean, <span class="sc">!</span><span class="fu">is.na</span>(zone))</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>    tab[<span class="fu">match</span>(i, countries), <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dfr) <span class="sc">-</span> <span class="fu">nrow</span>(dfr.clean)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>    <span class="co"># remove duplicates</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> dfr.clean</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>    dfr<span class="sc">$</span>duplicate <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>    dfr<span class="sc">$</span>duplicate[<span class="fu">duplicated</span>(dfr[, <span class="fu">c</span>(<span class="st">&quot;zone&quot;</span>, <span class="st">&quot;country&quot;</span>, <span class="st">&quot;type&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;survey_area&quot;</span>)])] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr, <span class="sc">!</span>duplicate)</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>    tab[<span class="fu">match</span>(i, countries), <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dfr) <span class="sc">-</span> <span class="fu">nrow</span>(dfr.clean)</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>    <span class="co"># remove extrapolations</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> dfr.clean</span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr, type <span class="sc">!=</span> <span class="st">&quot;EXTR&quot;</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>    tab[<span class="fu">match</span>(i, countries), <span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dfr) <span class="sc">-</span> <span class="fu">nrow</span>(dfr.clean)</span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>    <span class="co"># remove low reliability surveys</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> dfr.clean</span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr, reliability <span class="sc">!=</span> <span class="st">&quot;E&quot;</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>    tab[<span class="fu">match</span>(i, countries), <span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dfr) <span class="sc">-</span> <span class="fu">nrow</span>(dfr.clean)</span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>    <span class="co"># COMBINE SURVEYS FROM THE SAME ZONE IN THE SAME YEAR</span></span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> dfr.clean</span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>    dfr.clean <span class="ot">&lt;-</span> <span class="fu">ddply</span>(dfr, .(year, zone), summarize, <span class="at">region =</span> <span class="fu">unique</span>(region), <span class="at">subregion =</span> <span class="fu">unique</span>(subregion), <span class="at">survey_area_shrinkage =</span> <span class="fu">unique</span>(survey_area_shrinkage),</span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>        <span class="at">reliability =</span> <span class="fu">max</span>(<span class="fu">as.character</span>(reliability)), <span class="at">n_per_estimate =</span> <span class="fu">length</span>(estimate), <span class="at">estimate =</span> <span class="fu">sum</span>(estimate), <span class="at">survey_area =</span> <span class="fu">sum</span>(survey_area),</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>        <span class="at">density =</span> estimate<span class="sc">/</span>survey_area)</span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a></span>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>    tab[<span class="fu">match</span>(i, countries), <span class="dv">6</span>] <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dfr) <span class="sc">-</span> <span class="fu">nrow</span>(dfr.clean)</span>
+<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a>    <span class="co"># </span><span class="re">END</span><span class="co"> OF DATA QUALITY CHECKS</span></span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> dfr.clean</span>
+<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a>    <span class="co"># CHECK SURVEY AREA SIZES TO ENSURE THAT ONLY SURVEYS THAT COVER A SIMILAR AREA (KM2) PER ZONE ARE USED TO ESTIMATE</span></span>
+<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a>    <span class="co"># THE TREND IN DENSITY FOR THAT ZONE</span></span>
+<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a></span>
+<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a>    <span class="co"># 4. identify surveys that are 20% &#39;different&#39; from the modal area size. If any surveys in a time series are</span></span>
+<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a>    <span class="co"># different and survey is flagged as &#39;max&#39; then use max survey area for all years</span></span>
+<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a>    dfr.tmp <span class="ot">&lt;-</span> <span class="fu">ddply</span>(dfr, .(zone), summarize, <span class="at">region =</span> region, <span class="at">year =</span> year, <span class="at">survey_area =</span> survey_area, <span class="at">max_survey_area =</span> <span class="fu">rep</span>(<span class="fu">max</span>(survey_area),</span>
+<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a>        <span class="fu">length</span>(survey_area)), <span class="at">diff_from_mode_D20 =</span> <span class="sc">!</span>redData<span class="sc">::</span><span class="fu">trim</span>(<span class="at">x =</span> survey_area, <span class="at">delta =</span> <span class="fl">0.2</span>)[[<span class="st">&quot;trim&quot;</span>]], <span class="at">modal_survey_area =</span> <span class="fu">rep</span>(redData<span class="sc">::</span><span class="fu">trim</span>(<span class="at">x =</span> survey_area),</span>
+<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a>        <span class="at">length =</span> <span class="fu">length</span>(survey_area)), <span class="at">use_max =</span> <span class="fu">ifelse</span>(<span class="fu">any</span>(diff_from_mode_D20) <span class="sc">&amp;</span> survey_area_shrinkage, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span>
+<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a></span>
+<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> <span class="fu">merge</span>(dfr, dfr.tmp, <span class="at">all.x =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a></span>
+<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a>    <span class="co"># identify surveys that are 40% different and (for the revised density) have not had the survey area replaced by</span></span>
+<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a>    <span class="co"># the max and mark for deletion</span></span>
+<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a>    dfr.tmp <span class="ot">&lt;-</span> <span class="fu">ddply</span>(dfr, .(zone), summarize, <span class="at">region =</span> region, <span class="at">year =</span> year, <span class="at">survey_area =</span> survey_area, <span class="at">diff_from_mode_D40 =</span> <span class="sc">!</span>redData<span class="sc">::</span><span class="fu">trim</span>(<span class="at">x =</span> survey_area,</span>
+<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a>        <span class="at">delta =</span> <span class="fl">0.4</span>)[[<span class="st">&quot;trim&quot;</span>]], <span class="at">delete_revised =</span> <span class="fu">ifelse</span>(diff_from_mode_D40 <span class="sc">&amp;</span> <span class="sc">!</span>use_max, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>), <span class="at">delete =</span> <span class="fu">ifelse</span>(diff_from_mode_D40,</span>
+<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a>        <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span>
+<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a></span>
+<span id="cb4-66"><a href="#cb4-66" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> <span class="fu">merge</span>(dfr, dfr.tmp, <span class="at">all.x =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-67"><a href="#cb4-67" tabindex="-1"></a></span>
+<span id="cb4-68"><a href="#cb4-68" tabindex="-1"></a>    <span class="co"># revised survey area and density</span></span>
+<span id="cb4-69"><a href="#cb4-69" tabindex="-1"></a>    dfr<span class="sc">$</span>revised_survey_area <span class="ot">&lt;-</span> dfr<span class="sc">$</span>survey_area</span>
+<span id="cb4-70"><a href="#cb4-70" tabindex="-1"></a>    dfr<span class="sc">$</span>revised_survey_area[dfr<span class="sc">$</span>use_max] <span class="ot">&lt;-</span> dfr<span class="sc">$</span>max_survey_area[dfr<span class="sc">$</span>use_max]</span>
+<span id="cb4-71"><a href="#cb4-71" tabindex="-1"></a></span>
+<span id="cb4-72"><a href="#cb4-72" tabindex="-1"></a>    dfr<span class="sc">$</span>revised_density <span class="ot">&lt;-</span> dfr<span class="sc">$</span>estimate<span class="sc">/</span>dfr<span class="sc">$</span>revised_survey_area</span>
+<span id="cb4-73"><a href="#cb4-73" tabindex="-1"></a></span>
+<span id="cb4-74"><a href="#cb4-74" tabindex="-1"></a>    <span class="co"># count number surveys per zone</span></span>
+<span id="cb4-75"><a href="#cb4-75" tabindex="-1"></a>    dfr.tmp <span class="ot">&lt;-</span> <span class="fu">ddply</span>(dfr, .(zone), summarize, <span class="at">n_surveys =</span> <span class="fu">length</span>(density))</span>
+<span id="cb4-76"><a href="#cb4-76" tabindex="-1"></a>    dfr <span class="ot">&lt;-</span> <span class="fu">merge</span>(dfr, dfr.tmp, <span class="at">by =</span> <span class="st">&quot;zone&quot;</span>, <span class="at">all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-77"><a href="#cb4-77" tabindex="-1"></a></span>
+<span id="cb4-78"><a href="#cb4-78" tabindex="-1"></a>    <span class="co"># FORMAT AND CHECKING</span></span>
+<span id="cb4-79"><a href="#cb4-79" tabindex="-1"></a></span>
+<span id="cb4-80"><a href="#cb4-80" tabindex="-1"></a>    <span class="co"># check</span></span>
+<span id="cb4-81"><a href="#cb4-81" tabindex="-1"></a>    <span class="fu">stopifnot</span>(<span class="fu">nrow</span>(dfr) <span class="sc">==</span> <span class="fu">nrow</span>(dfr.clean))</span>
+<span id="cb4-82"><a href="#cb4-82" tabindex="-1"></a></span>
+<span id="cb4-83"><a href="#cb4-83" tabindex="-1"></a>    <span class="co"># save cleaned data</span></span>
+<span id="cb4-84"><a href="#cb4-84" tabindex="-1"></a>    dat_clean[[i]] <span class="ot">&lt;-</span> dfr</span>
+<span id="cb4-85"><a href="#cb4-85" tabindex="-1"></a></span>
+<span id="cb4-86"><a href="#cb4-86" tabindex="-1"></a>}</span></code></pre></div>
 <div id="data-quality-checks" class="section level1">
 <h1>Data quality checks</h1>
 <p>The following simple data quality checks were performed:</p>
 <ol style="list-style-type: decimal">
-<li>Delete incomplete records with: missing zone label, estimate, survey area, year or country</li>
-<li>Delete records with identical country/year/type/estimate/survey values (i.e. duplicated)</li>
+<li>Delete incomplete records with: missing zone label, estimate, survey
+area, year or country</li>
+<li>Delete records with identical country/year/type/estimate/survey
+values (i.e. duplicated)</li>
 <li>Delete records with type = EXTR</li>
 <li>Delete records with reliabilty = E</li>
 <li>Sum survey data from same year and zone to give average density</li>
 </ol>
 <table>
+<colgroup>
+<col width="34%" />
+<col width="17%" />
+<col width="17%" />
+<col width="10%" />
+<col width="6%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">Country</th>
@@ -796,39 +810,68 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="data-cleaning" class="section level1">
 <h1>Data cleaning</h1>
-<p>Cleaning involved the preparation of data records for use in trend analysis. The first step involved identification of the modal survey area size.</p>
+<p>Cleaning involved the preparation of data records for use in trend
+analysis. The first step involved identification of the modal survey
+area size.</p>
 <ol style="list-style-type: decimal">
-<li>Identify surveys where the survey area size had shrunk over time in response to a contracting population range.</li>
+<li>Identify surveys where the survey area size had shrunk over time in
+response to a contracting population range.</li>
 </ol>
-<p>Contraction of the survey range could lead to stabalisation of the density over time despite a declining population. Instances where this had occurred where identified using expert knowledge, and marked as <code>survey_area_shrinkage = TRUE</code>.</p>
+<p>Contraction of the survey range could lead to stabalisation of the
+density over time despite a declining population. Instances where this
+had occurred where identified using expert knowledge, and marked as
+<code>survey_area_shrinkage = TRUE</code>.</p>
 <ol start="2" style="list-style-type: decimal">
 <li>Identify modal area size</li>
 </ol>
-<p>This was the most commonly observed survey area value or, when there was more than one area value observed with equal frequency, the modal survey area was the area that minimised the summed difference with other area values. If there were any ties, then both modal values were retained.</p>
+<p>This was the most commonly observed survey area value or, when there
+was more than one area value observed with equal frequency, the modal
+survey area was the area that minimised the summed difference with other
+area values. If there were any ties, then both modal values were
+retained.</p>
 <ol start="3" style="list-style-type: decimal">
 <li>Identify surveys with size &gt;20% different from modal sizes</li>
 </ol>
-<p>Surveys with an area size of greater than 20% difference to the nearest modal area size for that zone where identified; i.e. if there were more than one modal area size, then the minimum difference was used. These survey records were marked as <code>diff_from_mode_D20 = TRUE</code>.</p>
+<p>Surveys with an area size of greater than 20% difference to the
+nearest modal area size for that zone where identified; i.e. if there
+were more than one modal area size, then the minimum difference was
+used. These survey records were marked as
+<code>diff_from_mode_D20 = TRUE</code>.</p>
 <ol start="4" style="list-style-type: decimal">
-<li>Apply maximum survey area size to all records in a survey time series that have noticeable shrinkage.</li>
+<li>Apply maximum survey area size to all records in a survey time
+series that have noticeable shrinkage.</li>
 </ol>
-<p>If <code>survey_area_shrinkage == TRUE</code> and <code>any(diff_from_mode_D20) == TRUE</code> then the maximum survey area size was applied to all surveys in that series when calculating the density. These records were marked as <code>use_max = TRUE</code></p>
+<p>If <code>survey_area_shrinkage == TRUE</code> and
+<code>any(diff_from_mode_D20) == TRUE</code> then the maximum survey
+area size was applied to all surveys in that series when calculating the
+density. These records were marked as <code>use_max = TRUE</code></p>
 <ol start="5" style="list-style-type: decimal">
-<li>If any of the remaining surveys are &gt;40% from the mode the exclude that survey</li>
+<li>If any of the remaining surveys are &gt;40% from the mode the
+exclude that survey</li>
 </ol>
-<p>If <code>use_max == FALSE</code> and <code>diff_from_mode_D40 = TRUE</code> then that particular survey was deleted (i.e. <code>delete = TRUE</code>).</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># for each country print summary stats and plots</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
-<span id="cb5-4"><a href="#cb5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5"></a>    tab &lt;-<span class="st"> </span><span class="kw">ddply</span>(dat_clean[[i]], .(zone), summarize, <span class="dt">mean_area =</span> <span class="kw">round</span>(<span class="kw">mean</span>(survey_area), <span class="dv">0</span>), <span class="dt">mean_revised_area =</span> <span class="kw">round</span>(<span class="kw">mean</span>(revised_survey_area),</span>
-<span id="cb5-6"><a href="#cb5-6"></a>        <span class="dv">0</span>), <span class="dt">modal_area =</span> <span class="kw">unique</span>(modal_survey_area), <span class="dt">n_surveys =</span> <span class="kw">unique</span>(n_surveys), <span class="dt">yrs_total =</span> <span class="kw">paste</span>(<span class="kw">range</span>(year), <span class="dt">collapse =</span> <span class="st">&quot;-&quot;</span>))</span>
-<span id="cb5-7"><a href="#cb5-7"></a></span>
-<span id="cb5-8"><a href="#cb5-8"></a>    <span class="kw">print</span>(<span class="kw">paste</span>(<span class="st">&quot;Summary data for&quot;</span>, i))</span>
-<span id="cb5-9"><a href="#cb5-9"></a>    <span class="kw">pandoc.table</span>(tab, <span class="dt">style =</span> <span class="st">&quot;rmarkdown&quot;</span>, <span class="dt">split.tables =</span> <span class="ot">Inf</span>)</span>
-<span id="cb5-10"><a href="#cb5-10"></a>}</span></code></pre></div>
+<p>If <code>use_max == FALSE</code> and
+<code>diff_from_mode_D40 = TRUE</code> then that particular survey was
+deleted (i.e. <code>delete = TRUE</code>).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># for each country print summary stats and plots</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>    tab <span class="ot">&lt;-</span> <span class="fu">ddply</span>(dat_clean[[i]], .(zone), summarize, <span class="at">mean_area =</span> <span class="fu">round</span>(<span class="fu">mean</span>(survey_area), <span class="dv">0</span>), <span class="at">mean_revised_area =</span> <span class="fu">round</span>(<span class="fu">mean</span>(revised_survey_area),</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>        <span class="dv">0</span>), <span class="at">modal_area =</span> <span class="fu">unique</span>(modal_survey_area), <span class="at">n_surveys =</span> <span class="fu">unique</span>(n_surveys), <span class="at">yrs_total =</span> <span class="fu">paste</span>(<span class="fu">range</span>(year), <span class="at">collapse =</span> <span class="st">&quot;-&quot;</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;Summary data for&quot;</span>, i))</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>    <span class="fu">pandoc.table</span>(tab, <span class="at">style =</span> <span class="st">&quot;rmarkdown&quot;</span>, <span class="at">split.tables =</span> <span class="cn">Inf</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>}</span></code></pre></div>
 <p>[1] “Summary data for Togo (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="29%" />
+<col width="12%" />
+<col width="20%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -884,6 +927,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Kenya (africana)”</p>
 <table>
+<colgroup>
+<col width="37%" />
+<col width="10%" />
+<col width="18%" />
+<col width="11%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -1170,7 +1221,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Cote d’Ivoire (cyclotis)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="28%" />
+<col width="12%" />
+<col width="21%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -1377,7 +1436,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Cameroon (cyclotis)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="36%" />
+<col width="11%" />
+<col width="19%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -1569,6 +1636,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for South Africa (africana)”</p>
 <table>
+<colgroup>
+<col width="34%" />
+<col width="11%" />
+<col width="19%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2120,6 +2195,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Burkina Faso (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="32%" />
+<col width="11%" />
+<col width="20%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2247,6 +2330,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Rwanda (africana)”</p>
 <table>
+<colgroup>
+<col width="27%" />
+<col width="12%" />
+<col width="21%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2285,7 +2376,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Ethiopia (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="37%" />
+<col width="10%" />
+<col width="18%" />
+<col width="11%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2397,6 +2496,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Benin (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="27%" />
+<col width="12%" />
+<col width="21%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2476,6 +2583,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Angola (africana)”</p>
 <table>
+<colgroup>
+<col width="26%" />
+<col width="12%" />
+<col width="21%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2547,6 +2662,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Nigeria (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="22%" />
+<col width="13%" />
+<col width="22%" />
+<col width="14%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2618,6 +2741,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Ghana (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="31%" />
+<col width="11%" />
+<col width="20%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2713,6 +2844,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Tanzania (africana)”</p>
 <table>
+<colgroup>
+<col width="32%" />
+<col width="11%" />
+<col width="19%" />
+<col width="13%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2927,7 +3066,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Niger (cyclotis)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="12%" />
+<col width="15%" />
+<col width="26%" />
+<col width="16%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -2959,6 +3106,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Sierra Leone (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="20%" />
+<col width="13%" />
+<col width="23%" />
+<col width="15%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3006,6 +3161,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Sudan (africana)”</p>
 <table>
+<colgroup>
+<col width="22%" />
+<col width="12%" />
+<col width="22%" />
+<col width="16%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3077,6 +3240,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Congo (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="32%" />
+<col width="11%" />
+<col width="20%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3244,6 +3415,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Chad (africana)”</p>
 <table>
+<colgroup>
+<col width="31%" />
+<col width="11%" />
+<col width="20%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3386,7 +3565,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for CAR (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="20%" />
+<col width="13%" />
+<col width="23%" />
+<col width="14%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3418,6 +3605,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for CAR (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="18%" />
+<col width="13%" />
+<col width="23%" />
+<col width="16%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3464,7 +3659,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Zambia (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="36%" />
+<col width="10%" />
+<col width="18%" />
+<col width="11%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3768,6 +3971,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Mozambique (africana)”</p>
 <table>
+<colgroup>
+<col width="39%" />
+<col width="10%" />
+<col width="17%" />
+<col width="12%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3943,6 +4154,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Liberia (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="13%" />
+<col width="14%" />
+<col width="25%" />
+<col width="16%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -3974,6 +4193,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Gabon (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="21%" />
+<col width="13%" />
+<col width="23%" />
+<col width="14%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4141,6 +4368,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Cameroon (africana)”</p>
 <table>
+<colgroup>
+<col width="23%" />
+<col width="13%" />
+<col width="22%" />
+<col width="14%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4196,6 +4431,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for DRC (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="18%" />
+<col width="13%" />
+<col width="23%" />
+<col width="16%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4330,7 +4573,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Guinea Bissau (cyclotis)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="20%" />
+<col width="13%" />
+<col width="23%" />
+<col width="14%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4362,6 +4613,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Zimbabwe (africana)”</p>
 <table>
+<colgroup>
+<col width="35%" />
+<col width="11%" />
+<col width="19%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4720,7 +4979,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Uganda (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="39%" />
+<col width="10%" />
+<col width="17%" />
+<col width="11%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4887,7 +5154,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for DRC (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="15%" />
+<col width="14%" />
+<col width="24%" />
+<col width="16%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4926,7 +5201,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Namibia (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="26%" />
+<col width="12%" />
+<col width="21%" />
+<col width="14%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -4989,7 +5272,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Botswana (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="34%" />
+<col width="10%" />
+<col width="18%" />
+<col width="13%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5045,6 +5336,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Eritrea (africana)”</p>
 <table>
+<colgroup>
+<col width="15%" />
+<col width="14%" />
+<col width="25%" />
+<col width="15%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5068,6 +5367,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Nigeria (africana)”</p>
 <table>
+<colgroup>
+<col width="23%" />
+<col width="13%" />
+<col width="22%" />
+<col width="14%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5155,6 +5462,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Mali (africana)”</p>
 <table>
+<colgroup>
+<col width="27%" />
+<col width="12%" />
+<col width="21%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5194,6 +5509,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Swaziland (africana)”</p>
 <table>
+<colgroup>
+<col width="29%" />
+<col width="12%" />
+<col width="20%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5233,6 +5556,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Malawi (africana)”</p>
 <table>
+<colgroup>
+<col width="31%" />
+<col width="11%" />
+<col width="20%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5304,6 +5635,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Senegal (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="17%" />
+<col width="14%" />
+<col width="24%" />
+<col width="15%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5327,6 +5666,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Guinea (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="14%" />
+<col width="14%" />
+<col width="25%" />
+<col width="16%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5358,6 +5705,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </table>
 <p>[1] “Summary data for Equatorial Guinea (cyclotis)”</p>
 <table>
+<colgroup>
+<col width="13%" />
+<col width="14%" />
+<col width="25%" />
+<col width="16%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5380,7 +5735,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>[1] “Summary data for Somalia (africana)”</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col width="12%" />
+<col width="15%" />
+<col width="26%" />
+<col width="16%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">zone</th>
@@ -5403,25 +5766,25 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>Melt list</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>dat &lt;-<span class="st"> </span><span class="kw">ldply</span>(dat_clean, <span class="dt">.id =</span> <span class="st">&quot;country&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">ldply</span>(dat_clean, <span class="at">.id =</span> <span class="st">&quot;country&quot;</span>)</span></code></pre></div>
 <p>Coerce factors</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>dat<span class="op">$</span>region &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>region)</span>
-<span id="cb7-2"><a href="#cb7-2"></a>dat<span class="op">$</span>subregion &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>subregion)</span>
-<span id="cb7-3"><a href="#cb7-3"></a>dat<span class="op">$</span>country &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>country)</span>
-<span id="cb7-4"><a href="#cb7-4"></a>dat<span class="op">$</span>zone &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>zone)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>dat<span class="sc">$</span>region <span class="ot">&lt;-</span> <span class="fu">as.character</span>(dat<span class="sc">$</span>region)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>dat<span class="sc">$</span>subregion <span class="ot">&lt;-</span> <span class="fu">as.character</span>(dat<span class="sc">$</span>subregion)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>dat<span class="sc">$</span>country <span class="ot">&lt;-</span> <span class="fu">as.character</span>(dat<span class="sc">$</span>country)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>dat<span class="sc">$</span>zone <span class="ot">&lt;-</span> <span class="fu">as.character</span>(dat<span class="sc">$</span>zone)</span></code></pre></div>
 <p>Delete sites with all zero</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>dfr &lt;-<span class="st"> </span><span class="kw">ddply</span>(dat, .(zone), summarize, <span class="dt">allzero =</span> <span class="kw">all</span>(estimate <span class="op">==</span><span class="st"> </span><span class="dv">0</span>))</span>
-<span id="cb8-2"><a href="#cb8-2"></a></span>
-<span id="cb8-3"><a href="#cb8-3"></a>dfr &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, <span class="op">!</span>allzero)</span>
-<span id="cb8-4"><a href="#cb8-4"></a></span>
-<span id="cb8-5"><a href="#cb8-5"></a>dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, zone <span class="op">%in%</span><span class="st"> </span>dfr<span class="op">$</span>zone)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>dfr <span class="ot">&lt;-</span> <span class="fu">ddply</span>(dat, .(zone), summarize, <span class="at">allzero =</span> <span class="fu">all</span>(estimate <span class="sc">==</span> <span class="dv">0</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>dfr <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfr, <span class="sc">!</span>allzero)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">subset</span>(dat, zone <span class="sc">%in%</span> dfr<span class="sc">$</span>zone)</span></code></pre></div>
 <p>Write .csv file</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">write.csv</span>(dat, <span class="dt">file =</span> <span class="st">&quot;GLOBAL_AED_1979_2016.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">write.csv</span>(dat, <span class="at">file =</span> <span class="st">&quot;GLOBAL_AED_1979_2016.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>Save to package data</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># save clean data</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a>AED &lt;-<span class="st"> </span>dat</span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">rm</span>(dat)</span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">suppressMessages</span>(usethis<span class="op">::</span><span class="kw">use_data</span>(AED, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># save clean data</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>AED <span class="ot">&lt;-</span> dat</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="fu">rm</span>(dat)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">suppressMessages</span>(usethis<span class="sc">::</span><span class="fu">use_data</span>(AED, <span class="at">overwrite =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 </div>
 
 

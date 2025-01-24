@@ -143,9 +143,9 @@ country_lookup <- function(zone) {
 }
 
 
-N0 <- posterior(reg_ll_out, pars = "N0", melt = TRUE, fun = "median", dim.names = list(list(iter = 1:nit, zone = zones)))[[1]]
-NT <- posterior(reg_ll_out, pars = "NT", melt = TRUE, fun = "median", dim.names = list(list(iter = 1:nit, zone = zones)))[[1]]
-ds <- posterior(reg_ll_out, pars = "decline_site", melt = TRUE, fun = "median", dim.names = list(list(iter = 1:nit, zone = zones)))[[1]]
+N0 <- posterior(reg_ll_out, pars = "N0", melt = TRUE, fun = "median", dim.names = list(list(zone = zones)))[[1]]
+NT <- posterior(reg_ll_out, pars = "NT", melt = TRUE, fun = "median", dim.names = list(list(zone = zones)))[[1]]
+ds <- posterior(reg_ll_out, pars = "decline_site", melt = TRUE, fun = "median", dim.names = list(list(zone = zones)))[[1]]
 
 dfr <- cbind(N0, NT, ds)
 colnames(dfr) <- c(paste0("N_", year_N0), "N_2015", "decline")

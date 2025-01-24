@@ -1,0 +1,29 @@
+Package: redData
+Type: Package
+Title: Red-list African elephant data
+Version: 1.1.1
+Date: 2022-09-04
+Author: AERL assessment team
+Maintainer: Charles T T Edwards <cescapecs@gmail.com>
+Description: Data for African elephant red-list assessment.
+License: GPL (>=3)
+LazyData: false
+VignetteBuilder: knitr
+Depends:
+    R (>= 4.0.2),
+Suggests:
+    markdown,
+    rmarkdown (>= 2.6),
+    knitr (>= 1.31),
+    ggplot2 (>= 3.3.3),
+    plyr (>= 1.8.0),
+    formatR (>= 1.00),
+    reshape2 (>= 1.4.0),
+    usethis (>= 2.0.0)
+Collate: 
+    'fill.R'
+    'label.R'
+    'mode.R'
+    'trim.R'
+    'zzz.R'
+RoxygenNote: 7.1.1

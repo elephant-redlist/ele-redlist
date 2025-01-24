@@ -1,0 +1,244 @@
+---
+title: "Cleaning script for AED data"
+author: "Charles T T Edwards"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: no
+vignette: >
+  %\VignetteIndexEntry{data}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.path = 'fig/clean-', fig.width = 6, tidy = TRUE, tidy.opts = list(blank = TRUE, width.cutoff = 120), message = FALSE, warning = FALSE, collapse = TRUE, comment = "#>")
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(pander))
+```
+
+```{r, echo=TRUE}
+# load data
+load("GLOBAL_AED_1979_2016_raw.rda")
+```
+
+```{r}
+# countries
+countries <- unique(dat$country)
+
+# cleaned data
+dat_clean <- vector('list', length(countries))
+names(dat_clean) <- countries
+
+# summary table
+tab <- data.frame(Country = countries, "no incomplete" = NA, "no duplicates" = NA, "no EXTR" = NA, "no E" = NA, "no averaged" = NA)
+```
+
+```{r}
+# check for unknown countries
+if (with(dat, any(is.na(country) | country == ""))) {
+    warning("deleting unknown countries")
+    dat <- subset(dat, !is.na(country) & country != "")    
+}
+```
+
+```{r}
+# loop over countries
+for (i in countries) {
+
+    dfr.clean <- subset(dat, country %in% i)
+
+    # SIMPLE CHECKS FOR DATA QUALITY
+    
+    # remove incomplete data records
+    dfr       <- dfr.clean
+    dfr.clean <- subset(dfr, zone != "")
+    dfr.clean <- subset(dfr.clean, !is.na(density))
+    dfr.clean <- subset(dfr.clean, !is.na(year))
+    dfr.clean <- subset(dfr.clean, !is.na(zone))
+    
+    tab[match(i, countries), 2] <- nrow(dfr) - nrow(dfr.clean)
+    
+    # remove duplicates
+    dfr           <- dfr.clean
+    dfr$duplicate <- FALSE
+    dfr$duplicate[duplicated(dfr[, c('zone', 'country', 'type', 'year', 'estimate', 'survey_area')])] <- TRUE
+
+    dfr.clean <- subset(dfr, !duplicate)
+    
+    tab[match(i, countries), 3] <- nrow(dfr) - nrow(dfr.clean)
+    
+    # remove extrapolations
+    dfr       <- dfr.clean
+    dfr.clean <- subset(dfr, type != "EXTR")
+    
+    tab[match(i, countries), 4] <- nrow(dfr) - nrow(dfr.clean)
+    
+    # remove low reliability surveys
+    dfr       <- dfr.clean
+    dfr.clean <- subset(dfr, reliability != "E")
+    
+    tab[match(i, countries), 5] <- nrow(dfr) - nrow(dfr.clean)
+    
+    # COMBINE SURVEYS FROM THE SAME ZONE IN THE SAME YEAR
+    dfr       <- dfr.clean
+    dfr.clean <- ddply(dfr, .(year, zone), summarize, 
+                       region = unique(region),
+                       subregion = unique(subregion),
+                       survey_area_shrinkage = unique(survey_area_shrinkage),
+                       reliability = max(as.character(reliability)), 
+                       n_per_estimate = length(estimate), 
+                       estimate = sum(estimate), 
+                       survey_area = sum(survey_area), 
+                       density = estimate / survey_area)
+    
+    tab[match(i, countries), 6] <- nrow(dfr) - nrow(dfr.clean)
+    
+    # END OF DATA QUALITY CHECKS
+    dfr <- dfr.clean
+    
+    # CHECK SURVEY AREA SIZES TO ENSURE THAT ONLY SURVEYS THAT COVER A SIMILAR
+    # AREA (KM2) PER ZONE ARE USED TO ESTIMATE THE TREND IN DENSITY FOR THAT 
+    # ZONE
+    
+    # 4. identify surveys that are 20% "different" from
+    # the modal area size. If any surveys in a time series are different
+    # and survey is flagged as "max" then use max survey area for all years
+    dfr.tmp <- ddply(dfr, .(zone), summarize, region = region, year = year, survey_area = survey_area, 
+                     max_survey_area = rep(max(survey_area), length(survey_area)),
+                     diff_from_mode_D20 = !redData::trim(x = survey_area, delta = 0.2)[['trim']], 
+                     modal_survey_area = rep(redData::trim(x = survey_area), length = length(survey_area)),
+                     use_max = ifelse(any(diff_from_mode_D20) & survey_area_shrinkage, TRUE, FALSE))
+    
+    dfr <- merge(dfr, dfr.tmp, all.x = TRUE)
+    
+    # identify surveys that are 40% different and (for the revised density)
+	# have not had the survey area replaced by the max and 
+	# mark for deletion
+    dfr.tmp <- ddply(dfr, .(zone), summarize, region = region, year = year, survey_area = survey_area,
+                     diff_from_mode_D40 = !redData::trim(x = survey_area, delta = 0.4)[['trim']], 
+                     delete_revised = ifelse(diff_from_mode_D40 & !use_max, TRUE, FALSE),
+					 delete = ifelse(diff_from_mode_D40, TRUE, FALSE))
+    
+    dfr <- merge(dfr, dfr.tmp, all.x = TRUE)
+    
+    # revised survey area and density
+    dfr$revised_survey_area <- dfr$survey_area
+    dfr$revised_survey_area[dfr$use_max] <- dfr$max_survey_area[dfr$use_max]
+    
+    dfr$revised_density <- dfr$estimate / dfr$revised_survey_area
+    
+    # count number surveys per zone
+    dfr.tmp <- ddply(dfr, .(zone), summarize, n_surveys = length(density))
+    dfr     <- merge(dfr, dfr.tmp, by = "zone", all = TRUE)
+
+    # FORMAT AND CHECKING
+    
+    # check 
+    stopifnot(nrow(dfr) == nrow(dfr.clean))
+    
+    # save cleaned data
+    dat_clean[[i]] <- dfr
+    
+}
+```
+
+# Data quality checks
+
+The following simple data quality checks were performed:
+
+1) Delete incomplete records with: missing zone label, estimate, survey area, year or country
+2) Delete records with identical country/year/type/estimate/survey values (i.e. duplicated)
+3) Delete records with type = EXTR
+4) Delete records with reliabilty = E
+5) Sum survey data from same year and zone to give average density
+
+```{r, echo = FALSE, results = "asis"}
+pandoc.table(tab, style = "rmarkdown", split.tables = Inf)
+```
+
+# Data cleaning
+
+Cleaning involved the preparation of data records for use in trend analysis. The first step involved identification of the modal survey area size. 
+
+1) Identify surveys where the survey area size had shrunk over time in response to a contracting population range. 
+
+Contraction of the survey range could lead to stabalisation of the density over time despite a declining population. Instances where this had occurred where identified using expert knowledge, and marked as `survey_area_shrinkage = TRUE`.
+
+2) Identify modal area size
+
+This was the most commonly observed survey area value or, when there was more than one area value observed with equal frequency, the modal survey area was the area that minimised the summed difference with other area values. If there were any ties, then both modal values were retained. 
+
+3) Identify surveys with size >20\% different from modal sizes
+
+Surveys with an area size of greater than 20\% difference to the nearest modal area size for that zone where identified; i.e. if there were more than one modal area size, then the minimum difference was used. These survey records were marked as `diff_from_mode_D20 = TRUE`.
+
+4) Apply maximum survey area size to all records in a survey time series that have noticeable shrinkage.
+
+If `survey_area_shrinkage == TRUE` and `any(diff_from_mode_D20) == TRUE` then the maximum survey area size was applied to all surveys in that series when calculating the density. These records were marked as `use_max = TRUE`
+
+5) If any of the remaining surveys are >40\% from the mode the exclude that survey
+
+If `use_max == FALSE` and `diff_from_mode_D40 = TRUE` then that particular survey was deleted (i.e. `delete = TRUE`).
+
+
+```{r, results = "asis"}
+# for each country print summary stats and plots
+
+for (i in countries) {
+    
+    tab <- ddply(dat_clean[[i]], .(zone), summarize, 
+                 mean_area = round(mean(survey_area),0), 
+                 mean_revised_area = round(mean(revised_survey_area),0),
+                 modal_area = unique(modal_survey_area), 
+                 n_surveys = unique(n_surveys),
+                 yrs_total = paste(range(year), collapse = "-"))
+
+    print(paste("Summary data for", i))
+    pandoc.table(tab, style = "rmarkdown", split.tables = Inf)
+}
+```
+
+Melt list
+```{r}
+dat <- ldply(dat_clean, .id = "country")
+```
+
+Coerce factors
+```{r}
+dat$region    <- as.character(dat$region)
+dat$subregion <- as.character(dat$subregion)
+dat$country   <- as.character(dat$country)
+dat$zone      <- as.character(dat$zone)
+```
+
+Delete sites with all zero
+```{r}
+dfr <- ddply(dat, .(zone), summarize, allzero = all(estimate == 0))
+
+dfr <- subset(dfr, !allzero)
+
+dat <- subset(dat, zone %in% dfr$zone)
+```
+
+```{r, echo = FALSE}
+if (any(is.na(dat$density))) stop("NA values in density")
+```
+
+Write .csv file
+```{r}
+write.csv(dat, file = "GLOBAL_AED_1979_2016.csv", row.names = FALSE)
+```
+
+Save to package data
+```{r, echo = TRUE}
+# save clean data
+AED <- dat; rm(dat)
+suppressMessages(usethis::use_data(AED, overwrite = TRUE))
+```
+
+
+

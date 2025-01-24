@@ -1,0 +1,5443 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Charles T T Edwards" />
+
+
+<title>Cleaning script for AED data</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Cleaning script for AED data</h1>
+<h4 class="author">Charles T T Edwards</h4>
+<h4 class="date">25 March, 2022</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># load data</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">load</span>(<span class="st">&quot;GLOBAL_AED_1979_2016_raw.rda&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># countries</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>countries &lt;-<span class="st"> </span><span class="kw">unique</span>(dat<span class="op">$</span>country)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># cleaned data</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>dat_clean &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="kw">length</span>(countries))</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="kw">names</span>(dat_clean) &lt;-<span class="st"> </span>countries</span>
+<span id="cb2-7"><a href="#cb2-7"></a></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co"># summary table</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>tab &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Country =</span> countries, <span class="st">`</span><span class="dt">no incomplete</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no duplicates</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no EXTR</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no E</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, <span class="st">`</span><span class="dt">no averaged</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># check for unknown countries</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="cf">if</span> (<span class="kw">with</span>(dat, <span class="kw">any</span>(<span class="kw">is.na</span>(country) <span class="op">|</span><span class="st"> </span>country <span class="op">==</span><span class="st"> &quot;&quot;</span>))) {</span>
+<span id="cb3-3"><a href="#cb3-3"></a>    <span class="kw">warning</span>(<span class="st">&quot;deleting unknown countries&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>    dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, <span class="op">!</span><span class="kw">is.na</span>(country) <span class="op">&amp;</span><span class="st"> </span>country <span class="op">!=</span><span class="st"> &quot;&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># loop over countries</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, country <span class="op">%in%</span><span class="st"> </span>i)</span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a>    <span class="co"># SIMPLE CHECKS FOR DATA QUALITY</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a>    <span class="co"># remove incomplete data records</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
+<span id="cb4-10"><a href="#cb4-10"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, zone <span class="op">!=</span><span class="st"> &quot;&quot;</span>)</span>
+<span id="cb4-11"><a href="#cb4-11"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr.clean, <span class="op">!</span><span class="kw">is.na</span>(density))</span>
+<span id="cb4-12"><a href="#cb4-12"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr.clean, <span class="op">!</span><span class="kw">is.na</span>(year))</span>
+<span id="cb4-13"><a href="#cb4-13"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr.clean, <span class="op">!</span><span class="kw">is.na</span>(zone))</span>
+<span id="cb4-14"><a href="#cb4-14"></a></span>
+<span id="cb4-15"><a href="#cb4-15"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
+<span id="cb4-16"><a href="#cb4-16"></a></span>
+<span id="cb4-17"><a href="#cb4-17"></a>    <span class="co"># remove duplicates</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
+<span id="cb4-19"><a href="#cb4-19"></a>    dfr<span class="op">$</span>duplicate &lt;-<span class="st"> </span><span class="ot">FALSE</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>    dfr<span class="op">$</span>duplicate[<span class="kw">duplicated</span>(dfr[, <span class="kw">c</span>(<span class="st">&quot;zone&quot;</span>, <span class="st">&quot;country&quot;</span>, <span class="st">&quot;type&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;survey_area&quot;</span>)])] &lt;-<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a></span>
+<span id="cb4-22"><a href="#cb4-22"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, <span class="op">!</span>duplicate)</span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
+<span id="cb4-25"><a href="#cb4-25"></a></span>
+<span id="cb4-26"><a href="#cb4-26"></a>    <span class="co"># remove extrapolations</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
+<span id="cb4-28"><a href="#cb4-28"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, type <span class="op">!=</span><span class="st"> &quot;EXTR&quot;</span>)</span>
+<span id="cb4-29"><a href="#cb4-29"></a></span>
+<span id="cb4-30"><a href="#cb4-30"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">4</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
+<span id="cb4-31"><a href="#cb4-31"></a></span>
+<span id="cb4-32"><a href="#cb4-32"></a>    <span class="co"># remove low reliability surveys</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
+<span id="cb4-34"><a href="#cb4-34"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, reliability <span class="op">!=</span><span class="st"> &quot;E&quot;</span>)</span>
+<span id="cb4-35"><a href="#cb4-35"></a></span>
+<span id="cb4-36"><a href="#cb4-36"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">5</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
+<span id="cb4-37"><a href="#cb4-37"></a></span>
+<span id="cb4-38"><a href="#cb4-38"></a>    <span class="co"># COMBINE SURVEYS FROM THE SAME ZONE IN THE SAME YEAR</span></span>
+<span id="cb4-39"><a href="#cb4-39"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
+<span id="cb4-40"><a href="#cb4-40"></a>    dfr.clean &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(year, zone), summarize, <span class="dt">region =</span> <span class="kw">unique</span>(region), <span class="dt">subregion =</span> <span class="kw">unique</span>(subregion), <span class="dt">survey_area_shrinkage =</span> <span class="kw">unique</span>(survey_area_shrinkage),</span>
+<span id="cb4-41"><a href="#cb4-41"></a>        <span class="dt">reliability =</span> <span class="kw">max</span>(<span class="kw">as.character</span>(reliability)), <span class="dt">n_per_estimate =</span> <span class="kw">length</span>(estimate), <span class="dt">estimate =</span> <span class="kw">sum</span>(estimate), <span class="dt">survey_area =</span> <span class="kw">sum</span>(survey_area),</span>
+<span id="cb4-42"><a href="#cb4-42"></a>        <span class="dt">density =</span> estimate<span class="op">/</span>survey_area)</span>
+<span id="cb4-43"><a href="#cb4-43"></a></span>
+<span id="cb4-44"><a href="#cb4-44"></a>    tab[<span class="kw">match</span>(i, countries), <span class="dv">6</span>] &lt;-<span class="st"> </span><span class="kw">nrow</span>(dfr) <span class="op">-</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean)</span>
+<span id="cb4-45"><a href="#cb4-45"></a></span>
+<span id="cb4-46"><a href="#cb4-46"></a>    <span class="co"># </span><span class="re">END</span><span class="co"> OF DATA QUALITY CHECKS</span></span>
+<span id="cb4-47"><a href="#cb4-47"></a>    dfr &lt;-<span class="st"> </span>dfr.clean</span>
+<span id="cb4-48"><a href="#cb4-48"></a></span>
+<span id="cb4-49"><a href="#cb4-49"></a>    <span class="co"># CHECK SURVEY AREA SIZES TO ENSURE THAT ONLY SURVEYS THAT COVER A SIMILAR AREA (KM2) PER ZONE ARE USED TO ESTIMATE</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a>    <span class="co"># THE TREND IN DENSITY FOR THAT ZONE</span></span>
+<span id="cb4-51"><a href="#cb4-51"></a></span>
+<span id="cb4-52"><a href="#cb4-52"></a>    <span class="co"># 4. identify surveys that are 20% &#39;different&#39; from the modal area size. If any surveys in a time series are</span></span>
+<span id="cb4-53"><a href="#cb4-53"></a>    <span class="co"># different and survey is flagged as &#39;max&#39; then use max survey area for all years</span></span>
+<span id="cb4-54"><a href="#cb4-54"></a>    dfr.tmp &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(zone), summarize, <span class="dt">region =</span> region, <span class="dt">year =</span> year, <span class="dt">survey_area =</span> survey_area, <span class="dt">max_survey_area =</span> <span class="kw">rep</span>(<span class="kw">max</span>(survey_area),</span>
+<span id="cb4-55"><a href="#cb4-55"></a>        <span class="kw">length</span>(survey_area)), <span class="dt">diff_from_mode_D20 =</span> <span class="op">!</span>redData<span class="op">::</span><span class="kw">trim</span>(<span class="dt">x =</span> survey_area, <span class="dt">delta =</span> <span class="fl">0.2</span>)[[<span class="st">&quot;trim&quot;</span>]], <span class="dt">modal_survey_area =</span> <span class="kw">rep</span>(redData<span class="op">::</span><span class="kw">trim</span>(<span class="dt">x =</span> survey_area),</span>
+<span id="cb4-56"><a href="#cb4-56"></a>        <span class="dt">length =</span> <span class="kw">length</span>(survey_area)), <span class="dt">use_max =</span> <span class="kw">ifelse</span>(<span class="kw">any</span>(diff_from_mode_D20) <span class="op">&amp;</span><span class="st"> </span>survey_area_shrinkage, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>))</span>
+<span id="cb4-57"><a href="#cb4-57"></a></span>
+<span id="cb4-58"><a href="#cb4-58"></a>    dfr &lt;-<span class="st"> </span><span class="kw">merge</span>(dfr, dfr.tmp, <span class="dt">all.x =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-59"><a href="#cb4-59"></a></span>
+<span id="cb4-60"><a href="#cb4-60"></a>    <span class="co"># identify surveys that are 40% different and (for the revised density) have not had the survey area replaced by</span></span>
+<span id="cb4-61"><a href="#cb4-61"></a>    <span class="co"># the max and mark for deletion</span></span>
+<span id="cb4-62"><a href="#cb4-62"></a>    dfr.tmp &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(zone), summarize, <span class="dt">region =</span> region, <span class="dt">year =</span> year, <span class="dt">survey_area =</span> survey_area, <span class="dt">diff_from_mode_D40 =</span> <span class="op">!</span>redData<span class="op">::</span><span class="kw">trim</span>(<span class="dt">x =</span> survey_area,</span>
+<span id="cb4-63"><a href="#cb4-63"></a>        <span class="dt">delta =</span> <span class="fl">0.4</span>)[[<span class="st">&quot;trim&quot;</span>]], <span class="dt">delete_revised =</span> <span class="kw">ifelse</span>(diff_from_mode_D40 <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span>use_max, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>), <span class="dt">delete =</span> <span class="kw">ifelse</span>(diff_from_mode_D40,</span>
+<span id="cb4-64"><a href="#cb4-64"></a>        <span class="ot">TRUE</span>, <span class="ot">FALSE</span>))</span>
+<span id="cb4-65"><a href="#cb4-65"></a></span>
+<span id="cb4-66"><a href="#cb4-66"></a>    dfr &lt;-<span class="st"> </span><span class="kw">merge</span>(dfr, dfr.tmp, <span class="dt">all.x =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-67"><a href="#cb4-67"></a></span>
+<span id="cb4-68"><a href="#cb4-68"></a>    <span class="co"># revised survey area and density</span></span>
+<span id="cb4-69"><a href="#cb4-69"></a>    dfr<span class="op">$</span>revised_survey_area &lt;-<span class="st"> </span>dfr<span class="op">$</span>survey_area</span>
+<span id="cb4-70"><a href="#cb4-70"></a>    dfr<span class="op">$</span>revised_survey_area[dfr<span class="op">$</span>use_max] &lt;-<span class="st"> </span>dfr<span class="op">$</span>max_survey_area[dfr<span class="op">$</span>use_max]</span>
+<span id="cb4-71"><a href="#cb4-71"></a></span>
+<span id="cb4-72"><a href="#cb4-72"></a>    dfr<span class="op">$</span>revised_density &lt;-<span class="st"> </span>dfr<span class="op">$</span>estimate<span class="op">/</span>dfr<span class="op">$</span>revised_survey_area</span>
+<span id="cb4-73"><a href="#cb4-73"></a></span>
+<span id="cb4-74"><a href="#cb4-74"></a>    <span class="co"># count number surveys per zone</span></span>
+<span id="cb4-75"><a href="#cb4-75"></a>    dfr.tmp &lt;-<span class="st"> </span><span class="kw">ddply</span>(dfr, .(zone), summarize, <span class="dt">n_surveys =</span> <span class="kw">length</span>(density))</span>
+<span id="cb4-76"><a href="#cb4-76"></a>    dfr &lt;-<span class="st"> </span><span class="kw">merge</span>(dfr, dfr.tmp, <span class="dt">by =</span> <span class="st">&quot;zone&quot;</span>, <span class="dt">all =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-77"><a href="#cb4-77"></a></span>
+<span id="cb4-78"><a href="#cb4-78"></a>    <span class="co"># FORMAT AND CHECKING</span></span>
+<span id="cb4-79"><a href="#cb4-79"></a></span>
+<span id="cb4-80"><a href="#cb4-80"></a>    <span class="co"># check</span></span>
+<span id="cb4-81"><a href="#cb4-81"></a>    <span class="kw">stopifnot</span>(<span class="kw">nrow</span>(dfr) <span class="op">==</span><span class="st"> </span><span class="kw">nrow</span>(dfr.clean))</span>
+<span id="cb4-82"><a href="#cb4-82"></a></span>
+<span id="cb4-83"><a href="#cb4-83"></a>    <span class="co"># save cleaned data</span></span>
+<span id="cb4-84"><a href="#cb4-84"></a>    dat_clean[[i]] &lt;-<span class="st"> </span>dfr</span>
+<span id="cb4-85"><a href="#cb4-85"></a></span>
+<span id="cb4-86"><a href="#cb4-86"></a>}</span></code></pre></div>
+<div id="data-quality-checks" class="section level1">
+<h1>Data quality checks</h1>
+<p>The following simple data quality checks were performed:</p>
+<ol style="list-style-type: decimal">
+<li>Delete incomplete records with: missing zone label, estimate, survey area, year or country</li>
+<li>Delete records with identical country/year/type/estimate/survey values (i.e. duplicated)</li>
+<li>Delete records with type = EXTR</li>
+<li>Delete records with reliabilty = E</li>
+<li>Sum survey data from same year and zone to give average density</li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Country</th>
+<th align="center">no.incomplete</th>
+<th align="center">no.duplicates</th>
+<th align="center">no.EXTR</th>
+<th align="center">no.E</th>
+<th align="center">no.averaged</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Togo (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center">Kenya (africana)</td>
+<td align="center">3</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">3</td>
+</tr>
+<tr class="odd">
+<td align="center">Cote d’Ivoire (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">3</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Cameroon (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">5</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">South Africa (africana)</td>
+<td align="center">2</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center">Burkina Faso (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">14</td>
+</tr>
+<tr class="odd">
+<td align="center">Rwanda (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Ethiopia (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">6</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Benin (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">Angola (africana)</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Nigeria (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Ghana (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Tanzania (africana)</td>
+<td align="center">5</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">8</td>
+</tr>
+<tr class="even">
+<td align="center">Niger (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Sierra Leone (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Sudan (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Congo (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">5</td>
+</tr>
+<tr class="even">
+<td align="center">Chad (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">5</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">CAR (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">5</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center">CAR (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Zambia (africana)</td>
+<td align="center">5</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">5</td>
+</tr>
+<tr class="even">
+<td align="center">Mozambique (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">10</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Liberia (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">9</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Gabon (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">Cameroon (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">DRC (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">5</td>
+<td align="center">6</td>
+</tr>
+<tr class="odd">
+<td align="center">Guinea Bissau (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Zimbabwe (africana)</td>
+<td align="center">2</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">10</td>
+<td align="center">2</td>
+</tr>
+<tr class="odd">
+<td align="center">Uganda (africana)</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">DRC (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">2</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Namibia (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">Botswana (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Eritrea (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Nigeria (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Mali (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">8</td>
+</tr>
+<tr class="even">
+<td align="center">Swaziland (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Malawi (africana)</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">2</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center">Senegal (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Guinea (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">Equatorial Guinea (cyclotis)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">2</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">Somalia (africana)</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="data-cleaning" class="section level1">
+<h1>Data cleaning</h1>
+<p>Cleaning involved the preparation of data records for use in trend analysis. The first step involved identification of the modal survey area size.</p>
+<ol style="list-style-type: decimal">
+<li>Identify surveys where the survey area size had shrunk over time in response to a contracting population range.</li>
+</ol>
+<p>Contraction of the survey range could lead to stabalisation of the density over time despite a declining population. Instances where this had occurred where identified using expert knowledge, and marked as <code>survey_area_shrinkage = TRUE</code>.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Identify modal area size</li>
+</ol>
+<p>This was the most commonly observed survey area value or, when there was more than one area value observed with equal frequency, the modal survey area was the area that minimised the summed difference with other area values. If there were any ties, then both modal values were retained.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Identify surveys with size &gt;20% different from modal sizes</li>
+</ol>
+<p>Surveys with an area size of greater than 20% difference to the nearest modal area size for that zone where identified; i.e. if there were more than one modal area size, then the minimum difference was used. These survey records were marked as <code>diff_from_mode_D20 = TRUE</code>.</p>
+<ol start="4" style="list-style-type: decimal">
+<li>Apply maximum survey area size to all records in a survey time series that have noticeable shrinkage.</li>
+</ol>
+<p>If <code>survey_area_shrinkage == TRUE</code> and <code>any(diff_from_mode_D20) == TRUE</code> then the maximum survey area size was applied to all surveys in that series when calculating the density. These records were marked as <code>use_max = TRUE</code></p>
+<ol start="5" style="list-style-type: decimal">
+<li>If any of the remaining surveys are &gt;40% from the mode the exclude that survey</li>
+</ol>
+<p>If <code>use_max == FALSE</code> and <code>diff_from_mode_D40 = TRUE</code> then that particular survey was deleted (i.e. <code>delete = TRUE</code>).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># for each country print summary stats and plots</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a>    tab &lt;-<span class="st"> </span><span class="kw">ddply</span>(dat_clean[[i]], .(zone), summarize, <span class="dt">mean_area =</span> <span class="kw">round</span>(<span class="kw">mean</span>(survey_area), <span class="dv">0</span>), <span class="dt">mean_revised_area =</span> <span class="kw">round</span>(<span class="kw">mean</span>(revised_survey_area),</span>
+<span id="cb5-6"><a href="#cb5-6"></a>        <span class="dv">0</span>), <span class="dt">modal_area =</span> <span class="kw">unique</span>(modal_survey_area), <span class="dt">n_surveys =</span> <span class="kw">unique</span>(n_surveys), <span class="dt">yrs_total =</span> <span class="kw">paste</span>(<span class="kw">range</span>(year), <span class="dt">collapse =</span> <span class="st">&quot;-&quot;</span>))</span>
+<span id="cb5-7"><a href="#cb5-7"></a></span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="kw">print</span>(<span class="kw">paste</span>(<span class="st">&quot;Summary data for&quot;</span>, i))</span>
+<span id="cb5-9"><a href="#cb5-9"></a>    <span class="kw">pandoc.table</span>(tab, <span class="dt">style =</span> <span class="st">&quot;rmarkdown&quot;</span>, <span class="dt">split.tables =</span> <span class="ot">Inf</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a>}</span></code></pre></div>
+<p>[1] “Summary data for Togo (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Abdoulaye</td>
+<td align="center">300</td>
+<td align="center">300</td>
+<td align="center">300</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="even">
+<td align="center">FAZ</td>
+<td align="center">2003</td>
+<td align="center">2003</td>
+<td align="center">1920</td>
+<td align="center">3</td>
+<td align="center">1987-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Fosse aux Lions</td>
+<td align="center">17</td>
+<td align="center">17</td>
+<td align="center">17</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Galangachi Forest Reserve</td>
+<td align="center">130</td>
+<td align="center">130</td>
+<td align="center">130</td>
+<td align="center">1</td>
+<td align="center">1987-1987</td>
+</tr>
+<tr class="odd">
+<td align="center">Oti Mandori Keran</td>
+<td align="center">2172</td>
+<td align="center">3054</td>
+<td align="center">1804</td>
+<td align="center">5</td>
+<td align="center">1987-2014</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Kenya (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Aberdare National Park and outside</td>
+<td align="center">1615</td>
+<td align="center">2000</td>
+<td align="center">2000</td>
+<td align="center">4</td>
+<td align="center">1977-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Amboseli</td>
+<td align="center">5548</td>
+<td align="center">5548</td>
+<td align="center">5547</td>
+<td align="center">7</td>
+<td align="center">1969-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Arabuko Sokoke</td>
+<td align="center">401</td>
+<td align="center">401</td>
+<td align="center">415</td>
+<td align="center">3</td>
+<td align="center">1991-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Boni and Dodori National Reserves</td>
+<td align="center">1643</td>
+<td align="center">1643</td>
+<td align="center">1643</td>
+<td align="center">1</td>
+<td align="center">2000-2000</td>
+</tr>
+<tr class="odd">
+<td align="center">Chyulu</td>
+<td align="center">1180</td>
+<td align="center">1180</td>
+<td align="center">1180</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Garissa</td>
+<td align="center">43623</td>
+<td align="center">43623</td>
+<td align="center">43623</td>
+<td align="center">1</td>
+<td align="center">1988-1988</td>
+</tr>
+<tr class="odd">
+<td align="center">Imenti</td>
+<td align="center">85</td>
+<td align="center">85</td>
+<td align="center">100;70</td>
+<td align="center">2</td>
+<td align="center">1994-1997</td>
+</tr>
+<tr class="even">
+<td align="center">Kerio Valley Ecosystem</td>
+<td align="center">4616</td>
+<td align="center">4616</td>
+<td align="center">4616</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="odd">
+<td align="center">Kilifi</td>
+<td align="center">12475</td>
+<td align="center">12475</td>
+<td align="center">12475</td>
+<td align="center">1</td>
+<td align="center">1993-1993</td>
+</tr>
+<tr class="even">
+<td align="center">Kipipiri Forest Reserve</td>
+<td align="center">43</td>
+<td align="center">43</td>
+<td align="center">43</td>
+<td align="center">1</td>
+<td align="center">2005-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Kitui</td>
+<td align="center">1853</td>
+<td align="center">1853</td>
+<td align="center">1827</td>
+<td align="center">3</td>
+<td align="center">1993-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Kora National Park</td>
+<td align="center">1704</td>
+<td align="center">1704</td>
+<td align="center">1789;1618</td>
+<td align="center">2</td>
+<td align="center">2002-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Laikipia-Samburu</td>
+<td align="center">17852</td>
+<td align="center">17852</td>
+<td align="center">10500</td>
+<td align="center">5</td>
+<td align="center">1970-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Lamu District</td>
+<td align="center">16738</td>
+<td align="center">50437</td>
+<td align="center">5964</td>
+<td align="center">5</td>
+<td align="center">1976-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Loroki</td>
+<td align="center">596</td>
+<td align="center">596</td>
+<td align="center">596</td>
+<td align="center">3</td>
+<td align="center">1992-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Magadi Ecosystem</td>
+<td align="center">6348</td>
+<td align="center">6348</td>
+<td align="center">6348</td>
+<td align="center">1</td>
+<td align="center">2013-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Marsabit</td>
+<td align="center">1714</td>
+<td align="center">1714</td>
+<td align="center">142</td>
+<td align="center">6</td>
+<td align="center">1977-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Masai Mara National Reserve Ecosystem</td>
+<td align="center">3744</td>
+<td align="center">3744</td>
+<td align="center">3488</td>
+<td align="center">6</td>
+<td align="center">1977-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Matthews Range</td>
+<td align="center">750</td>
+<td align="center">750</td>
+<td align="center">750</td>
+<td align="center">1</td>
+<td align="center">1992-1992</td>
+</tr>
+<tr class="even">
+<td align="center">Mau</td>
+<td align="center">1166</td>
+<td align="center">1166</td>
+<td align="center">1065;1267</td>
+<td align="center">2</td>
+<td align="center">1992-1995</td>
+</tr>
+<tr class="odd">
+<td align="center">Meru</td>
+<td align="center">1232</td>
+<td align="center">1232</td>
+<td align="center">884</td>
+<td align="center">6</td>
+<td align="center">1976-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Mt Elgon</td>
+<td align="center">1083</td>
+<td align="center">1083</td>
+<td align="center">1083</td>
+<td align="center">5</td>
+<td align="center">1977-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mt Kenya</td>
+<td align="center">2046</td>
+<td align="center">2046</td>
+<td align="center">2000;2007</td>
+<td align="center">4</td>
+<td align="center">1977-2001</td>
+</tr>
+<tr class="even">
+<td align="center">Mwea National Reserve</td>
+<td align="center">58</td>
+<td align="center">58</td>
+<td align="center">42</td>
+<td align="center">4</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Nasalot Ecosystem</td>
+<td align="center">5559</td>
+<td align="center">5559</td>
+<td align="center">5050</td>
+<td align="center">3</td>
+<td align="center">1992-2010</td>
+</tr>
+<tr class="even">
+<td align="center">Nguruman</td>
+<td align="center">2197</td>
+<td align="center">2197</td>
+<td align="center">2197</td>
+<td align="center">2</td>
+<td align="center">1998-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">North Kitui</td>
+<td align="center">714</td>
+<td align="center">714</td>
+<td align="center">745;682</td>
+<td align="center">2</td>
+<td align="center">2002-2007</td>
+</tr>
+<tr class="even">
+<td align="center">North Narok Landscape</td>
+<td align="center">310</td>
+<td align="center">310</td>
+<td align="center">310</td>
+<td align="center">2</td>
+<td align="center">2011-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Rahole</td>
+<td align="center">1477</td>
+<td align="center">1477</td>
+<td align="center">1477</td>
+<td align="center">1</td>
+<td align="center">2007-2007</td>
+</tr>
+<tr class="even">
+<td align="center">Rimoi-Kamnarok</td>
+<td align="center">105</td>
+<td align="center">105</td>
+<td align="center">105</td>
+<td align="center">1</td>
+<td align="center">1997-1997</td>
+</tr>
+<tr class="odd">
+<td align="center">Shimba Hills</td>
+<td align="center">238</td>
+<td align="center">238</td>
+<td align="center">250</td>
+<td align="center">6</td>
+<td align="center">1976-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Tana River</td>
+<td align="center">12317</td>
+<td align="center">36695</td>
+<td align="center">184</td>
+<td align="center">3</td>
+<td align="center">1975-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Transmara</td>
+<td align="center">1173</td>
+<td align="center">1173</td>
+<td align="center">320</td>
+<td align="center">3</td>
+<td align="center">1997-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Tsavo Ecosystem</td>
+<td align="center">37092</td>
+<td align="center">37092</td>
+<td align="center">37382</td>
+<td align="center">11</td>
+<td align="center">1974-2014</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Cote d’Ivoire (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Abokoamekro</td>
+<td align="center">135</td>
+<td align="center">135</td>
+<td align="center">135</td>
+<td align="center">2</td>
+<td align="center">1994-2000</td>
+</tr>
+<tr class="even">
+<td align="center">Azagny National Park</td>
+<td align="center">206</td>
+<td align="center">206</td>
+<td align="center">218</td>
+<td align="center">4</td>
+<td align="center">1979-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Beki-Bossematie</td>
+<td align="center">389</td>
+<td align="center">389</td>
+<td align="center">389</td>
+<td align="center">2</td>
+<td align="center">1993-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Bolo</td>
+<td align="center">88</td>
+<td align="center">88</td>
+<td align="center">88</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="odd">
+<td align="center">Comoe National Park</td>
+<td align="center">12862</td>
+<td align="center">12862</td>
+<td align="center">11500</td>
+<td align="center">6</td>
+<td align="center">1976-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Davo</td>
+<td align="center">126</td>
+<td align="center">126</td>
+<td align="center">126</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="odd">
+<td align="center">Djambamakrou</td>
+<td align="center">389</td>
+<td align="center">389</td>
+<td align="center">389</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="even">
+<td align="center">Duekoue</td>
+<td align="center">536</td>
+<td align="center">536</td>
+<td align="center">536</td>
+<td align="center">2</td>
+<td align="center">1989-1997</td>
+</tr>
+<tr class="odd">
+<td align="center">Fresco Forest</td>
+<td align="center">2229</td>
+<td align="center">2229</td>
+<td align="center">2229</td>
+<td align="center">1</td>
+<td align="center">1991-1991</td>
+</tr>
+<tr class="even">
+<td align="center">Go-Bodienou</td>
+<td align="center">600</td>
+<td align="center">600</td>
+<td align="center">600</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="odd">
+<td align="center">Haut Bandama</td>
+<td align="center">1300</td>
+<td align="center">1300</td>
+<td align="center">1300</td>
+<td align="center">2</td>
+<td align="center">1996-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Haut Sassandra</td>
+<td align="center">1024</td>
+<td align="center">1024</td>
+<td align="center">1024</td>
+<td align="center">1</td>
+<td align="center">1997-1997</td>
+</tr>
+<tr class="odd">
+<td align="center">Keregbo</td>
+<td align="center">213</td>
+<td align="center">213</td>
+<td align="center">213</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="even">
+<td align="center">Marahoue</td>
+<td align="center">1008</td>
+<td align="center">1008</td>
+<td align="center">1010</td>
+<td align="center">4</td>
+<td align="center">1979-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Mont Peko</td>
+<td align="center">340</td>
+<td align="center">340</td>
+<td align="center">340</td>
+<td align="center">2</td>
+<td align="center">1989-2000</td>
+</tr>
+<tr class="even">
+<td align="center">Mont Sangbe</td>
+<td align="center">950</td>
+<td align="center">950</td>
+<td align="center">950</td>
+<td align="center">3</td>
+<td align="center">1989-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Mont Tingui and Kinkene</td>
+<td align="center">515</td>
+<td align="center">515</td>
+<td align="center">515</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Niegre</td>
+<td align="center">1056</td>
+<td align="center">1056</td>
+<td align="center">1056</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="odd">
+<td align="center">Okromodou</td>
+<td align="center">945</td>
+<td align="center">945</td>
+<td align="center">945</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="even">
+<td align="center">Scio</td>
+<td align="center">1338</td>
+<td align="center">1338</td>
+<td align="center">1338</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="odd">
+<td align="center">Songan Tamin Mabi Yaya</td>
+<td align="center">1698</td>
+<td align="center">1698</td>
+<td align="center">1698</td>
+<td align="center">1</td>
+<td align="center">1993-1993</td>
+</tr>
+<tr class="even">
+<td align="center">Tai</td>
+<td align="center">5391</td>
+<td align="center">8119</td>
+<td align="center">6410</td>
+<td align="center">6</td>
+<td align="center">1979-2010</td>
+</tr>
+<tr class="odd">
+<td align="center">Tene</td>
+<td align="center">4</td>
+<td align="center">4</td>
+<td align="center">4</td>
+<td align="center">2</td>
+<td align="center">1989-1998</td>
+</tr>
+<tr class="even">
+<td align="center">Tiapleu</td>
+<td align="center">380</td>
+<td align="center">380</td>
+<td align="center">380</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Cameroon (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Abong-Mbang</td>
+<td align="center">1597</td>
+<td align="center">1597</td>
+<td align="center">1597</td>
+<td align="center">1</td>
+<td align="center">2001-2001</td>
+</tr>
+<tr class="even">
+<td align="center">Banyang-Mbo</td>
+<td align="center">585</td>
+<td align="center">585</td>
+<td align="center">662</td>
+<td align="center">3</td>
+<td align="center">1993-2007</td>
+</tr>
+<tr class="odd">
+<td align="center">Boumba-Bek</td>
+<td align="center">2358</td>
+<td align="center">2358</td>
+<td align="center">2383</td>
+<td align="center">5</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Boumba-Bek Nki Logging Concessions</td>
+<td align="center">3678</td>
+<td align="center">3678</td>
+<td align="center">3678</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Campo-Maan</td>
+<td align="center">1235</td>
+<td align="center">1235</td>
+<td align="center">648;1302</td>
+<td align="center">4</td>
+<td align="center">2000-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Campo-Maan logging concession 21</td>
+<td align="center">364</td>
+<td align="center">364</td>
+<td align="center">364</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Campo-Maan logging concession 24</td>
+<td align="center">748</td>
+<td align="center">748</td>
+<td align="center">748</td>
+<td align="center">2</td>
+<td align="center">2000-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Campo-Maan logging concession 25</td>
+<td align="center">882</td>
+<td align="center">882</td>
+<td align="center">882</td>
+<td align="center">2</td>
+<td align="center">2000-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Deng Deng</td>
+<td align="center">884</td>
+<td align="center">884</td>
+<td align="center">884</td>
+<td align="center">1</td>
+<td align="center">2012-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Dja</td>
+<td align="center">5260</td>
+<td align="center">5260</td>
+<td align="center">5260</td>
+<td align="center">3</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Korup</td>
+<td align="center">1254</td>
+<td align="center">1254</td>
+<td align="center">1250;1259</td>
+<td align="center">2</td>
+<td align="center">1993-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Lobeke</td>
+<td align="center">2048</td>
+<td align="center">2048</td>
+<td align="center">1985</td>
+<td align="center">3</td>
+<td align="center">1993-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Lobeke SA</td>
+<td align="center">6006</td>
+<td align="center">6006</td>
+<td align="center">6006</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Mbam et Djerem</td>
+<td align="center">1433</td>
+<td align="center">1433</td>
+<td align="center">1433</td>
+<td align="center">1</td>
+<td align="center">2009-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">Mengame and Kom</td>
+<td align="center">1425</td>
+<td align="center">1425</td>
+<td align="center">1425</td>
+<td align="center">1</td>
+<td align="center">2003-2003</td>
+</tr>
+<tr class="even">
+<td align="center">Mongokele</td>
+<td align="center">1004</td>
+<td align="center">1004</td>
+<td align="center">850;1159</td>
+<td align="center">2</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mt Cameroon</td>
+<td align="center">676</td>
+<td align="center">676</td>
+<td align="center">676</td>
+<td align="center">2</td>
+<td align="center">2003-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Ngoyla-Mintom Forest</td>
+<td align="center">9242</td>
+<td align="center">9242</td>
+<td align="center">9242</td>
+<td align="center">2</td>
+<td align="center">2011-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Nki</td>
+<td align="center">2667</td>
+<td align="center">2667</td>
+<td align="center">3093</td>
+<td align="center">3</td>
+<td align="center">1998-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Takamanda National Park</td>
+<td align="center">633</td>
+<td align="center">633</td>
+<td align="center">633</td>
+<td align="center">1</td>
+<td align="center">2013-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Yabassi</td>
+<td align="center">2425</td>
+<td align="center">2425</td>
+<td align="center">2425</td>
+<td align="center">2</td>
+<td align="center">2002-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Yoko</td>
+<td align="center">25</td>
+<td align="center">25</td>
+<td align="center">25</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for South Africa (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Addo Elephant National Park</td>
+<td align="center">620</td>
+<td align="center">620</td>
+<td align="center">513</td>
+<td align="center">6</td>
+<td align="center">1976-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Andover Game Reserve ns</td>
+<td align="center">71</td>
+<td align="center">71</td>
+<td align="center">71</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Atherstone Nature Reserve</td>
+<td align="center">186</td>
+<td align="center">240</td>
+<td align="center">136</td>
+<td align="center">6</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Borakalalo National Park</td>
+<td align="center">120</td>
+<td align="center">120</td>
+<td align="center">120</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Game Services NS</td>
+<td align="center">30</td>
+<td align="center">30</td>
+<td align="center">30</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Garden Route National Park</td>
+<td align="center">126</td>
+<td align="center">126</td>
+<td align="center">126</td>
+<td align="center">1</td>
+<td align="center">2005-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Great Fish River Nature Reserve</td>
+<td align="center">390</td>
+<td align="center">450</td>
+<td align="center">450</td>
+<td align="center">4</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Greater Kuduland Safaris</td>
+<td align="center">120</td>
+<td align="center">120</td>
+<td align="center">120</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Hluhluwe-iMfolozi Park</td>
+<td align="center">965</td>
+<td align="center">965</td>
+<td align="center">965</td>
+<td align="center">6</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Isimangaliso Wetland Park</td>
+<td align="center">887</td>
+<td align="center">2205</td>
+<td align="center">539</td>
+<td align="center">5</td>
+<td align="center">2002-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Ithala Nature Reserve</td>
+<td align="center">297</td>
+<td align="center">297</td>
+<td align="center">297</td>
+<td align="center">6</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Kaia Ingwe</td>
+<td align="center">45</td>
+<td align="center">45</td>
+<td align="center">45</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Kapama Private Game Reserve</td>
+<td align="center">183</td>
+<td align="center">183</td>
+<td align="center">120;246</td>
+<td align="center">2</td>
+<td align="center">1994-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Kariega Private Game Reserve</td>
+<td align="center">190</td>
+<td align="center">190</td>
+<td align="center">190</td>
+<td align="center">2</td>
+<td align="center">2005-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Klaserie Private Nature Reserve</td>
+<td align="center">647</td>
+<td align="center">647</td>
+<td align="center">628</td>
+<td align="center">5</td>
+<td align="center">1977-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Knysa Forest Reserve</td>
+<td align="center">213</td>
+<td align="center">213</td>
+<td align="center">300;126</td>
+<td align="center">6</td>
+<td align="center">1977-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Kruger National Park</td>
+<td align="center">16802</td>
+<td align="center">16802</td>
+<td align="center">19624</td>
+<td align="center">9</td>
+<td align="center">1964-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Kwalata</td>
+<td align="center">80</td>
+<td align="center">80</td>
+<td align="center">80</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Kwandwe Private Game Reserve</td>
+<td align="center">158</td>
+<td align="center">158</td>
+<td align="center">158</td>
+<td align="center">2</td>
+<td align="center">2005-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Lalibela Private Game Reserve</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">1</td>
+<td align="center">2005-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Letaba Game Ranch</td>
+<td align="center">416</td>
+<td align="center">416</td>
+<td align="center">420</td>
+<td align="center">5</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Lowhills NS</td>
+<td align="center">30</td>
+<td align="center">30</td>
+<td align="center">30</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Mabula Game Lodge</td>
+<td align="center">80</td>
+<td align="center">80</td>
+<td align="center">80</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Madikwe Nature Reserve</td>
+<td align="center">677</td>
+<td align="center">677</td>
+<td align="center">700</td>
+<td align="center">6</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mahlatini Game Reserve ns</td>
+<td align="center">15</td>
+<td align="center">15</td>
+<td align="center">15</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Makalali Private Game Reserve</td>
+<td align="center">118</td>
+<td align="center">118</td>
+<td align="center">140</td>
+<td align="center">3</td>
+<td align="center">1994-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Makuya Nature Reserve</td>
+<td align="center">219</td>
+<td align="center">219</td>
+<td align="center">165</td>
+<td align="center">6</td>
+<td align="center">1997-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Manyeleti Game Reserve</td>
+<td align="center">228</td>
+<td align="center">228</td>
+<td align="center">228</td>
+<td align="center">4</td>
+<td align="center">1997-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">Mapungubwe Ecosystem</td>
+<td align="center">279</td>
+<td align="center">279</td>
+<td align="center">279</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Marakele</td>
+<td align="center">350</td>
+<td align="center">350</td>
+<td align="center">380</td>
+<td align="center">4</td>
+<td align="center">1998-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Maremani</td>
+<td align="center">400</td>
+<td align="center">400</td>
+<td align="center">400</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Mjejane Game Reserve</td>
+<td align="center">40</td>
+<td align="center">40</td>
+<td align="center">40</td>
+<td align="center">1</td>
+<td align="center">2009-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">Mkuze Falls Safaris</td>
+<td align="center">22</td>
+<td align="center">22</td>
+<td align="center">22</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Mkuzi Game Reserve</td>
+<td align="center">384</td>
+<td align="center">384</td>
+<td align="center">380</td>
+<td align="center">5</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mokolo River Nature Reserve ns</td>
+<td align="center">45</td>
+<td align="center">45</td>
+<td align="center">45</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Mosi-Sihungwane area Tongaland</td>
+<td align="center">800</td>
+<td align="center">800</td>
+<td align="center">800</td>
+<td align="center">1</td>
+<td align="center">1974-1974</td>
+</tr>
+<tr class="odd">
+<td align="center">Mthethomusha</td>
+<td align="center">76</td>
+<td align="center">76</td>
+<td align="center">80;72</td>
+<td align="center">4</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Mtibi Game Ranch ns</td>
+<td align="center">25</td>
+<td align="center">25</td>
+<td align="center">25</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Munyawana Game Reserve</td>
+<td align="center">245</td>
+<td align="center">245</td>
+<td align="center">245</td>
+<td align="center">1</td>
+<td align="center">2005-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Ndzalama Game Reserve ns</td>
+<td align="center">79</td>
+<td align="center">79</td>
+<td align="center">79</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Pamula Game Lodge ns</td>
+<td align="center">21</td>
+<td align="center">21</td>
+<td align="center">21</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Paradise Game Ranch ad</td>
+<td align="center">30</td>
+<td align="center">30</td>
+<td align="center">30</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Phalaborwa Mining Company</td>
+<td align="center">41</td>
+<td align="center">41</td>
+<td align="center">41</td>
+<td align="center">4</td>
+<td align="center">1994-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Phinda Resource Reserve</td>
+<td align="center">135</td>
+<td align="center">135</td>
+<td align="center">135</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Pilanesberg National Park</td>
+<td align="center">546</td>
+<td align="center">546</td>
+<td align="center">553</td>
+<td align="center">5</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Pongola Nature Reserve</td>
+<td align="center">119</td>
+<td align="center">119</td>
+<td align="center">119</td>
+<td align="center">3</td>
+<td align="center">1997-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Pumulanga</td>
+<td align="center">25</td>
+<td align="center">25</td>
+<td align="center">25</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Rhinoland Safaris</td>
+<td align="center">68</td>
+<td align="center">68</td>
+<td align="center">68</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Riverside</td>
+<td align="center">40</td>
+<td align="center">40</td>
+<td align="center">40</td>
+<td align="center">1</td>
+<td align="center">1995-1995</td>
+</tr>
+<tr class="even">
+<td align="center">Royal Natal National Park</td>
+<td align="center">74</td>
+<td align="center">74</td>
+<td align="center">74</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Sabie Sands</td>
+<td align="center">522</td>
+<td align="center">522</td>
+<td align="center">572</td>
+<td align="center">5</td>
+<td align="center">1977-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Selati Game Reserve</td>
+<td align="center">300</td>
+<td align="center">300</td>
+<td align="center">300</td>
+<td align="center">2</td>
+<td align="center">2002-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Shamwari Game Reserve</td>
+<td align="center">130</td>
+<td align="center">130</td>
+<td align="center">60;200</td>
+<td align="center">2</td>
+<td align="center">1994-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Songimvelo Game Reserve</td>
+<td align="center">481</td>
+<td align="center">650</td>
+<td align="center">490</td>
+<td align="center">5</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Sutton Game Ranch</td>
+<td align="center">20</td>
+<td align="center">20</td>
+<td align="center">20</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Tembe Elephant Park</td>
+<td align="center">295</td>
+<td align="center">295</td>
+<td align="center">300</td>
+<td align="center">6</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Thaba Tholo</td>
+<td align="center">250</td>
+<td align="center">250</td>
+<td align="center">250</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Thornybush Game Lodge</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">1</td>
+<td align="center">1995-1995</td>
+</tr>
+<tr class="odd">
+<td align="center">Thukela Biosphere</td>
+<td align="center">600</td>
+<td align="center">600</td>
+<td align="center">600</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Timbavati Nature Reserve</td>
+<td align="center">635</td>
+<td align="center">635</td>
+<td align="center">494</td>
+<td align="center">5</td>
+<td align="center">1977-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Touchstone Game Ranch</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Tshukudu Game Lodge ns</td>
+<td align="center">45</td>
+<td align="center">45</td>
+<td align="center">45</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Umbabat Nature Reserve</td>
+<td align="center">144</td>
+<td align="center">144</td>
+<td align="center">144</td>
+<td align="center">4</td>
+<td align="center">1994-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Venetia-Limpopo National Park</td>
+<td align="center">177</td>
+<td align="center">350</td>
+<td align="center">91</td>
+<td align="center">3</td>
+<td align="center">1995-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Vosdal</td>
+<td align="center">115</td>
+<td align="center">115</td>
+<td align="center">115</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Welgevonden Private Reserve</td>
+<td align="center">305</td>
+<td align="center">305</td>
+<td align="center">330</td>
+<td align="center">3</td>
+<td align="center">1995-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Zulu Nyala Safaris</td>
+<td align="center">7</td>
+<td align="center">7</td>
+<td align="center">7</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Burkina Faso (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Aires L’ Est</td>
+<td align="center">4977</td>
+<td align="center">4977</td>
+<td align="center">5737</td>
+<td align="center">7</td>
+<td align="center">1981-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Arly</td>
+<td align="center">1112</td>
+<td align="center">1112</td>
+<td align="center">1223</td>
+<td align="center">6</td>
+<td align="center">1992-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Bontioli</td>
+<td align="center">420</td>
+<td align="center">420</td>
+<td align="center">420</td>
+<td align="center">2</td>
+<td align="center">1998-2007</td>
+</tr>
+<tr class="even">
+<td align="center">Comoe-Leraba</td>
+<td align="center">1204</td>
+<td align="center">1204</td>
+<td align="center">1204</td>
+<td align="center">1</td>
+<td align="center">2005-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">Diefoula Classified Forest</td>
+<td align="center">880</td>
+<td align="center">880</td>
+<td align="center">880</td>
+<td align="center">1</td>
+<td align="center">1998-1998</td>
+</tr>
+<tr class="even">
+<td align="center">Koakrana</td>
+<td align="center">241</td>
+<td align="center">241</td>
+<td align="center">229</td>
+<td align="center">3</td>
+<td align="center">2000-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Konkombri</td>
+<td align="center">217</td>
+<td align="center">217</td>
+<td align="center">217</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Kourtiagou</td>
+<td align="center">1283</td>
+<td align="center">1283</td>
+<td align="center">485</td>
+<td align="center">3</td>
+<td align="center">2002-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mare aux Hippopotames</td>
+<td align="center">192</td>
+<td align="center">192</td>
+<td align="center">192</td>
+<td align="center">2</td>
+<td align="center">2005-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Mohoun Protected Area Complex</td>
+<td align="center">1899</td>
+<td align="center">1899</td>
+<td align="center">1894</td>
+<td align="center">5</td>
+<td align="center">1974-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Nazinga Ecosystem</td>
+<td align="center">892</td>
+<td align="center">892</td>
+<td align="center">940</td>
+<td align="center">6</td>
+<td align="center">1987-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Niangoloko</td>
+<td align="center">82</td>
+<td align="center">82</td>
+<td align="center">82</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">W Burkina</td>
+<td align="center">2514</td>
+<td align="center">2514</td>
+<td align="center">2878</td>
+<td align="center">7</td>
+<td align="center">1981-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Zabre Department</td>
+<td align="center">600</td>
+<td align="center">600</td>
+<td align="center">600</td>
+<td align="center">2</td>
+<td align="center">1998-2013</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Rwanda (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Akagera</td>
+<td align="center">2557</td>
+<td align="center">3463</td>
+<td align="center">3120</td>
+<td align="center">3</td>
+<td align="center">1994-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Nyungwe Forest Reserve</td>
+<td align="center">1088</td>
+<td align="center">1088</td>
+<td align="center">1088</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+<tr class="odd">
+<td align="center">Volcans National Park</td>
+<td align="center">150</td>
+<td align="center">150</td>
+<td align="center">150</td>
+<td align="center">2</td>
+<td align="center">1989-2003</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Ethiopia (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Alatish National Park</td>
+<td align="center">2600</td>
+<td align="center">2600</td>
+<td align="center">2600</td>
+<td align="center">2</td>
+<td align="center">2009-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Ameya-Bonga Area</td>
+<td align="center">6700</td>
+<td align="center">6700</td>
+<td align="center">6700</td>
+<td align="center">1</td>
+<td align="center">1990-1990</td>
+</tr>
+<tr class="odd">
+<td align="center">Babille Elephant Sanctuary</td>
+<td align="center">6408</td>
+<td align="center">6408</td>
+<td align="center">6982</td>
+<td align="center">6</td>
+<td align="center">1976-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Boran Controlled Hunting Area</td>
+<td align="center">2181</td>
+<td align="center">2181</td>
+<td align="center">150;4212</td>
+<td align="center">2</td>
+<td align="center">1990-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">Chebera Churchura National Park</td>
+<td align="center">3624</td>
+<td align="center">3624</td>
+<td align="center">3500</td>
+<td align="center">3</td>
+<td align="center">1990-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Chew Bahr Wildlife Reserve</td>
+<td align="center">4212</td>
+<td align="center">4212</td>
+<td align="center">4212</td>
+<td align="center">1</td>
+<td align="center">2001-2001</td>
+</tr>
+<tr class="odd">
+<td align="center">Dabus Valley Controlled Hunting Area</td>
+<td align="center">4560</td>
+<td align="center">4560</td>
+<td align="center">6994;2127</td>
+<td align="center">2</td>
+<td align="center">1990-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Gambella National Park</td>
+<td align="center">12350</td>
+<td align="center">12350</td>
+<td align="center">5061</td>
+<td align="center">4</td>
+<td align="center">1990-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Geralle National Park</td>
+<td align="center">4212</td>
+<td align="center">4212</td>
+<td align="center">4212</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Kafta-Sheraro National Park</td>
+<td align="center">1130</td>
+<td align="center">1130</td>
+<td align="center">1130</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mago and Omo National Parks</td>
+<td align="center">7126</td>
+<td align="center">10000</td>
+<td align="center">6230;7853</td>
+<td align="center">6</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Mizan Teferi Controlled Hunting Area</td>
+<td align="center">3160</td>
+<td align="center">3160</td>
+<td align="center">3160</td>
+<td align="center">2</td>
+<td align="center">2006-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Benin (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Atakora</td>
+<td align="center">1156</td>
+<td align="center">1356</td>
+<td align="center">1321</td>
+<td align="center">3</td>
+<td align="center">2002-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Djona</td>
+<td align="center">1184</td>
+<td align="center">1184</td>
+<td align="center">1216</td>
+<td align="center">5</td>
+<td align="center">1981-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Goungoun</td>
+<td align="center">806</td>
+<td align="center">806</td>
+<td align="center">806</td>
+<td align="center">1</td>
+<td align="center">2003-2003</td>
+</tr>
+<tr class="even">
+<td align="center">Monts Kouffe Forest</td>
+<td align="center">1908</td>
+<td align="center">1908</td>
+<td align="center">1908</td>
+<td align="center">1</td>
+<td align="center">1991-1991</td>
+</tr>
+<tr class="odd">
+<td align="center">Oueme Superieur Forest</td>
+<td align="center">1883</td>
+<td align="center">1883</td>
+<td align="center">1883</td>
+<td align="center">1</td>
+<td align="center">1991-1991</td>
+</tr>
+<tr class="even">
+<td align="center">Pendjari</td>
+<td align="center">3446</td>
+<td align="center">6037</td>
+<td align="center">2755;2827</td>
+<td align="center">8</td>
+<td align="center">1976-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Trois Rivieres Forest</td>
+<td align="center">2639</td>
+<td align="center">2639</td>
+<td align="center">2639</td>
+<td align="center">1</td>
+<td align="center">1991-1991</td>
+</tr>
+<tr class="even">
+<td align="center">W Benin</td>
+<td align="center">5105</td>
+<td align="center">5872</td>
+<td align="center">5020</td>
+<td align="center">8</td>
+<td align="center">1976-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Angola (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Ambriz Reserve</td>
+<td align="center">94857</td>
+<td align="center">94857</td>
+<td align="center">94857</td>
+<td align="center">1</td>
+<td align="center">1978-1978</td>
+</tr>
+<tr class="even">
+<td align="center">Bikuar National Park</td>
+<td align="center">6954</td>
+<td align="center">6954</td>
+<td align="center">6954</td>
+<td align="center">1</td>
+<td align="center">1992-1992</td>
+</tr>
+<tr class="odd">
+<td align="center">Bongola NS</td>
+<td align="center">1505</td>
+<td align="center">1505</td>
+<td align="center">1505</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Kambondo Forest</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">75</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Luiana</td>
+<td align="center">8610</td>
+<td align="center">8610</td>
+<td align="center">8163</td>
+<td align="center">3</td>
+<td align="center">1989-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Quicama National Park</td>
+<td align="center">11428</td>
+<td align="center">15284</td>
+<td align="center">9500</td>
+<td align="center">3</td>
+<td align="center">1978-2002</td>
+</tr>
+<tr class="odd">
+<td align="center">Southern Mupa</td>
+<td align="center">240024</td>
+<td align="center">240024</td>
+<td align="center">240024</td>
+<td align="center">1</td>
+<td align="center">1978-1978</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Nigeria (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Andoni Island</td>
+<td align="center">183</td>
+<td align="center">183</td>
+<td align="center">215</td>
+<td align="center">3</td>
+<td align="center">1993-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Cross River</td>
+<td align="center">239</td>
+<td align="center">239</td>
+<td align="center">239</td>
+<td align="center">1</td>
+<td align="center">1998-1998</td>
+</tr>
+<tr class="odd">
+<td align="center">Ifon Game Reserve</td>
+<td align="center">283</td>
+<td align="center">283</td>
+<td align="center">283</td>
+<td align="center">1</td>
+<td align="center">2007-2007</td>
+</tr>
+<tr class="even">
+<td align="center">Kainji</td>
+<td align="center">4632</td>
+<td align="center">4632</td>
+<td align="center">3924;5340</td>
+<td align="center">2</td>
+<td align="center">1976-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Okumu</td>
+<td align="center">1082</td>
+<td align="center">1082</td>
+<td align="center">1082</td>
+<td align="center">2</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Omo</td>
+<td align="center">1086</td>
+<td align="center">1086</td>
+<td align="center">871;1300</td>
+<td align="center">2</td>
+<td align="center">1993-1994</td>
+</tr>
+<tr class="odd">
+<td align="center">Taylor Creek</td>
+<td align="center">145</td>
+<td align="center">145</td>
+<td align="center">145</td>
+<td align="center">1</td>
+<td align="center">1993-1993</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Ghana (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Ankasa</td>
+<td align="center">574</td>
+<td align="center">574</td>
+<td align="center">509</td>
+<td align="center">3</td>
+<td align="center">1994-2009</td>
+</tr>
+<tr class="even">
+<td align="center">Bia</td>
+<td align="center">286</td>
+<td align="center">286</td>
+<td align="center">306</td>
+<td align="center">6</td>
+<td align="center">1977-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">Chichibon</td>
+<td align="center">290</td>
+<td align="center">290</td>
+<td align="center">290</td>
+<td align="center">1</td>
+<td align="center">1994-1994</td>
+</tr>
+<tr class="even">
+<td align="center">Dadieso</td>
+<td align="center">195</td>
+<td align="center">195</td>
+<td align="center">195</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="odd">
+<td align="center">Digya</td>
+<td align="center">3478</td>
+<td align="center">3478</td>
+<td align="center">3478</td>
+<td align="center">2</td>
+<td align="center">1994-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Goaso</td>
+<td align="center">2035</td>
+<td align="center">2035</td>
+<td align="center">2035</td>
+<td align="center">3</td>
+<td align="center">1994-2007</td>
+</tr>
+<tr class="odd">
+<td align="center">Kakum</td>
+<td align="center">362</td>
+<td align="center">362</td>
+<td align="center">366</td>
+<td align="center">3</td>
+<td align="center">1990-2004</td>
+</tr>
+<tr class="even">
+<td align="center">Mole</td>
+<td align="center">4672</td>
+<td align="center">4672</td>
+<td align="center">4840;4504</td>
+<td align="center">2</td>
+<td align="center">1993-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">North Western Corridor</td>
+<td align="center">584</td>
+<td align="center">584</td>
+<td align="center">584</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Red and White Volta - Morago</td>
+<td align="center">1282</td>
+<td align="center">1370</td>
+<td align="center">1370</td>
+<td align="center">3</td>
+<td align="center">1996-2006</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Tanzania (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Arusha National Park</td>
+<td align="center">248</td>
+<td align="center">322</td>
+<td align="center">322</td>
+<td align="center">3</td>
+<td align="center">1978-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Itigi</td>
+<td align="center">2596</td>
+<td align="center">2596</td>
+<td align="center">2596</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Katavi-Rukwa Ecosystem</td>
+<td align="center">11830</td>
+<td align="center">31080</td>
+<td align="center">11862</td>
+<td align="center">10</td>
+<td align="center">1977-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Kilimanjaro</td>
+<td align="center">573</td>
+<td align="center">802</td>
+<td align="center">499</td>
+<td align="center">3</td>
+<td align="center">1967-2003</td>
+</tr>
+<tr class="odd">
+<td align="center">Lake Manyara</td>
+<td align="center">533</td>
+<td align="center">533</td>
+<td align="center">246</td>
+<td align="center">5</td>
+<td align="center">1969-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Loliondo</td>
+<td align="center">2889</td>
+<td align="center">2889</td>
+<td align="center">422;5356</td>
+<td align="center">2</td>
+<td align="center">2006-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">Makao</td>
+<td align="center">1019</td>
+<td align="center">1019</td>
+<td align="center">1019</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Marang</td>
+<td align="center">212</td>
+<td align="center">212</td>
+<td align="center">212</td>
+<td align="center">1</td>
+<td align="center">1978-1978</td>
+</tr>
+<tr class="odd">
+<td align="center">Masai Mara TZ</td>
+<td align="center">5726</td>
+<td align="center">5726</td>
+<td align="center">5726</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Mkomazi</td>
+<td align="center">3558</td>
+<td align="center">3558</td>
+<td align="center">3509</td>
+<td align="center">6</td>
+<td align="center">1978-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Moyowosi-Kigosi Game Reserve</td>
+<td align="center">20961</td>
+<td align="center">20961</td>
+<td align="center">21870</td>
+<td align="center">6</td>
+<td align="center">1994-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Mto wa Mbu</td>
+<td align="center">191</td>
+<td align="center">191</td>
+<td align="center">191</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Natron</td>
+<td align="center">8916</td>
+<td align="center">8916</td>
+<td align="center">4759;13073</td>
+<td align="center">2</td>
+<td align="center">2002-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Ngorongoro</td>
+<td align="center">2350</td>
+<td align="center">2350</td>
+<td align="center">150;4549</td>
+<td align="center">2</td>
+<td align="center">1978-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Piti East</td>
+<td align="center">2223</td>
+<td align="center">2223</td>
+<td align="center">2223</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Ruaha Rungwa Ecosystem</td>
+<td align="center">34488</td>
+<td align="center">34488</td>
+<td align="center">41927</td>
+<td align="center">11</td>
+<td align="center">1976-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Rubondo Island</td>
+<td align="center">400</td>
+<td align="center">400</td>
+<td align="center">400</td>
+<td align="center">3</td>
+<td align="center">1990-2009</td>
+</tr>
+<tr class="even">
+<td align="center">Saadani Game Reserve</td>
+<td align="center">2586</td>
+<td align="center">2586</td>
+<td align="center">2502</td>
+<td align="center">3</td>
+<td align="center">1998-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Sagara Nyamagoma Ecosystem</td>
+<td align="center">11468</td>
+<td align="center">11468</td>
+<td align="center">12726</td>
+<td align="center">4</td>
+<td align="center">2002-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Selous Ecosystem</td>
+<td align="center">83998</td>
+<td align="center">83998</td>
+<td align="center">81056;81046</td>
+<td align="center">8</td>
+<td align="center">1976-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Serengeti</td>
+<td align="center">18363</td>
+<td align="center">18363</td>
+<td align="center">16860</td>
+<td align="center">8</td>
+<td align="center">1976-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Tarangire Ecosystem</td>
+<td align="center">9850</td>
+<td align="center">9850</td>
+<td align="center">12826</td>
+<td align="center">8</td>
+<td align="center">1976-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Ugalla Game Reserve Ecosystem</td>
+<td align="center">9080</td>
+<td align="center">9080</td>
+<td align="center">7252;10276</td>
+<td align="center">6</td>
+<td align="center">1991-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Uwanda Game Reserve</td>
+<td align="center">2200</td>
+<td align="center">2200</td>
+<td align="center">2200</td>
+<td align="center">1</td>
+<td align="center">1978-1978</td>
+</tr>
+<tr class="odd">
+<td align="center">Yaidi Chini</td>
+<td align="center">3975</td>
+<td align="center">3975</td>
+<td align="center">3975</td>
+<td align="center">1</td>
+<td align="center">1977-1977</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Niger (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Baban</td>
+<td align="center">430</td>
+<td align="center">430</td>
+<td align="center">430</td>
+<td align="center">1</td>
+<td align="center">2005-2005</td>
+</tr>
+<tr class="even">
+<td align="center">W Niger</td>
+<td align="center">2238</td>
+<td align="center">2238</td>
+<td align="center">2200</td>
+<td align="center">5</td>
+<td align="center">1977-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Sierra Leone (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bagbe</td>
+<td align="center">349</td>
+<td align="center">349</td>
+<td align="center">349</td>
+<td align="center">1</td>
+<td align="center">1995-1995</td>
+</tr>
+<tr class="even">
+<td align="center">Gola East</td>
+<td align="center">287</td>
+<td align="center">287</td>
+<td align="center">287</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Gola North</td>
+<td align="center">242</td>
+<td align="center">242</td>
+<td align="center">242</td>
+<td align="center">1</td>
+<td align="center">1987-1987</td>
+</tr>
+<tr class="even">
+<td align="center">Outamba Kilimi</td>
+<td align="center">410</td>
+<td align="center">410</td>
+<td align="center">461;358</td>
+<td align="center">2</td>
+<td align="center">1994-2006</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Sudan (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bahr el Ghazal</td>
+<td align="center">128858</td>
+<td align="center">128858</td>
+<td align="center">128858</td>
+<td align="center">1</td>
+<td align="center">1976-1976</td>
+</tr>
+<tr class="even">
+<td align="center">Blue Nile</td>
+<td align="center">78643</td>
+<td align="center">78643</td>
+<td align="center">78643</td>
+<td align="center">1</td>
+<td align="center">1976-1976</td>
+</tr>
+<tr class="odd">
+<td align="center">East Equatoria</td>
+<td align="center">98910</td>
+<td align="center">98910</td>
+<td align="center">119377;78444</td>
+<td align="center">2</td>
+<td align="center">1976-2008</td>
+</tr>
+<tr class="even">
+<td align="center">El Buheyrat</td>
+<td align="center">94820</td>
+<td align="center">94820</td>
+<td align="center">149319;40321</td>
+<td align="center">2</td>
+<td align="center">1976-2007</td>
+</tr>
+<tr class="odd">
+<td align="center">Jonglei Ecosystem</td>
+<td align="center">94085</td>
+<td align="center">94085</td>
+<td align="center">117714;70456</td>
+<td align="center">2</td>
+<td align="center">1976-2007</td>
+</tr>
+<tr class="even">
+<td align="center">South Kordofan</td>
+<td align="center">138400</td>
+<td align="center">138400</td>
+<td align="center">138400</td>
+<td align="center">1</td>
+<td align="center">1976-1976</td>
+</tr>
+<tr class="odd">
+<td align="center">Upper Nile</td>
+<td align="center">118996</td>
+<td align="center">118996</td>
+<td align="center">118996</td>
+<td align="center">1</td>
+<td align="center">1976-1976</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Congo (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bailly</td>
+<td align="center">5792</td>
+<td align="center">5792</td>
+<td align="center">5792</td>
+<td align="center">2</td>
+<td align="center">2006-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Batanga</td>
+<td align="center">1029</td>
+<td align="center">1029</td>
+<td align="center">1029</td>
+<td align="center">2</td>
+<td align="center">2008-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Conkouati-Douli</td>
+<td align="center">3096</td>
+<td align="center">3096</td>
+<td align="center">3850</td>
+<td align="center">3</td>
+<td align="center">2000-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Djoua-Ivindo</td>
+<td align="center">11415</td>
+<td align="center">11415</td>
+<td align="center">11415</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Kabo and Pokola</td>
+<td align="center">7275</td>
+<td align="center">7275</td>
+<td align="center">7275</td>
+<td align="center">2</td>
+<td align="center">2006-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Lac Tele</td>
+<td align="center">4219</td>
+<td align="center">4219</td>
+<td align="center">4219</td>
+<td align="center">2</td>
+<td align="center">2004-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Lefini</td>
+<td align="center">445</td>
+<td align="center">445</td>
+<td align="center">445</td>
+<td align="center">1</td>
+<td align="center">2007-2007</td>
+</tr>
+<tr class="even">
+<td align="center">Lossi-Kelle</td>
+<td align="center">5051</td>
+<td align="center">5051</td>
+<td align="center">5051</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Loundougou Swamps</td>
+<td align="center">2515</td>
+<td align="center">2515</td>
+<td align="center">2515</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Loundougou Terra Firma</td>
+<td align="center">4228</td>
+<td align="center">4228</td>
+<td align="center">4228</td>
+<td align="center">2</td>
+<td align="center">2006-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Mayoko</td>
+<td align="center">2290</td>
+<td align="center">2290</td>
+<td align="center">2290</td>
+<td align="center">1</td>
+<td align="center">2005-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Messok-Dja Forest Area</td>
+<td align="center">1457</td>
+<td align="center">1457</td>
+<td align="center">1457</td>
+<td align="center">1</td>
+<td align="center">2013-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Mokabi Logging Concession</td>
+<td align="center">2664</td>
+<td align="center">2664</td>
+<td align="center">2669;2660</td>
+<td align="center">2</td>
+<td align="center">2003-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Mount Fouari-Mavoumbou-Nyanga</td>
+<td align="center">883</td>
+<td align="center">883</td>
+<td align="center">883</td>
+<td align="center">2</td>
+<td align="center">1994-2005</td>
+</tr>
+<tr class="odd">
+<td align="center">MPD area</td>
+<td align="center">1139</td>
+<td align="center">1139</td>
+<td align="center">1139</td>
+<td align="center">1</td>
+<td align="center">2012-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Ngombe-Pikounda-Ntokou area</td>
+<td align="center">16186</td>
+<td align="center">16186</td>
+<td align="center">16186</td>
+<td align="center">2</td>
+<td align="center">2007-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Nouabale Ndoki</td>
+<td align="center">4044</td>
+<td align="center">4044</td>
+<td align="center">4071</td>
+<td align="center">4</td>
+<td align="center">2001-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Odzala</td>
+<td align="center">13870</td>
+<td align="center">13870</td>
+<td align="center">13545</td>
+<td align="center">3</td>
+<td align="center">2000-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Ogooue-Leketi</td>
+<td align="center">1025</td>
+<td align="center">1025</td>
+<td align="center">1025</td>
+<td align="center">1</td>
+<td align="center">2009-2009</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Chad (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bake - Yamodo - Gore</td>
+<td align="center">3500</td>
+<td align="center">3500</td>
+<td align="center">3500</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Binder Lere</td>
+<td align="center">1840</td>
+<td align="center">1840</td>
+<td align="center">1840</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Birket Fatime Bousso Batha</td>
+<td align="center">1884</td>
+<td align="center">1884</td>
+<td align="center">1884</td>
+<td align="center">2</td>
+<td align="center">2013-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Bousso - Mbere Area</td>
+<td align="center">4570</td>
+<td align="center">4570</td>
+<td align="center">4570</td>
+<td align="center">1</td>
+<td align="center">2013-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Chari Baguirmi Massenya</td>
+<td align="center">7088</td>
+<td align="center">7088</td>
+<td align="center">10864;3312</td>
+<td align="center">2</td>
+<td align="center">2002-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Dembo</td>
+<td align="center">2436</td>
+<td align="center">2436</td>
+<td align="center">2409</td>
+<td align="center">3</td>
+<td align="center">2002-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Gagal - Yapala</td>
+<td align="center">3543</td>
+<td align="center">3543</td>
+<td align="center">4640</td>
+<td align="center">3</td>
+<td align="center">2002-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Heban-Mourraye area</td>
+<td align="center">4591</td>
+<td align="center">4591</td>
+<td align="center">4591</td>
+<td align="center">1</td>
+<td align="center">2013-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Koloudia-Doum Doum Area</td>
+<td align="center">2272</td>
+<td align="center">2272</td>
+<td align="center">2180;2363</td>
+<td align="center">2</td>
+<td align="center">2002-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Lac Fitri Area</td>
+<td align="center">4167</td>
+<td align="center">4167</td>
+<td align="center">4167</td>
+<td align="center">3</td>
+<td align="center">2002-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Lake Tchad-Baga Sola</td>
+<td align="center">963</td>
+<td align="center">963</td>
+<td align="center">963</td>
+<td align="center">2</td>
+<td align="center">2013-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Larmanaye</td>
+<td align="center">2260</td>
+<td align="center">2260</td>
+<td align="center">2340;2180</td>
+<td align="center">2</td>
+<td align="center">2002-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mbaibokoum-Mbitoye-Bekan</td>
+<td align="center">4962</td>
+<td align="center">4962</td>
+<td align="center">6052;3872</td>
+<td align="center">2</td>
+<td align="center">2013-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Ngourou - Gondei</td>
+<td align="center">300</td>
+<td align="center">300</td>
+<td align="center">300</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Siniaka-Minia Faunal Reserve</td>
+<td align="center">4740</td>
+<td align="center">4740</td>
+<td align="center">4740</td>
+<td align="center">2</td>
+<td align="center">2002-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Zakouma National Park</td>
+<td align="center">3110</td>
+<td align="center">3110</td>
+<td align="center">2987</td>
+<td align="center">6</td>
+<td align="center">1976-2014</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for CAR (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bamingui</td>
+<td align="center">23541</td>
+<td align="center">23541</td>
+<td align="center">20123</td>
+<td align="center">3</td>
+<td align="center">1976-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Northern region</td>
+<td align="center">29579</td>
+<td align="center">38240</td>
+<td align="center">38240</td>
+<td align="center">6</td>
+<td align="center">1970-2010</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for CAR (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bangassou</td>
+<td align="center">11050</td>
+<td align="center">11050</td>
+<td align="center">5500;16600</td>
+<td align="center">2</td>
+<td align="center">1989-1996</td>
+</tr>
+<tr class="even">
+<td align="center">Chinko</td>
+<td align="center">18300</td>
+<td align="center">18300</td>
+<td align="center">17600;19000</td>
+<td align="center">2</td>
+<td align="center">2012-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Dzanga Sangha</td>
+<td align="center">3866</td>
+<td align="center">4743</td>
+<td align="center">4743</td>
+<td align="center">6</td>
+<td align="center">1986-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Yobe-Lidjombe</td>
+<td align="center">756</td>
+<td align="center">756</td>
+<td align="center">756</td>
+<td align="center">1</td>
+<td align="center">2012-2012</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Zambia (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bangweulu System</td>
+<td align="center">8718</td>
+<td align="center">8718</td>
+<td align="center">15115</td>
+<td align="center">4</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Chete Islands</td>
+<td align="center">57</td>
+<td align="center">57</td>
+<td align="center">57</td>
+<td align="center">2</td>
+<td align="center">1991-2008</td>
+</tr>
+<tr class="odd">
+<td align="center">Chiawa Game Management Area</td>
+<td align="center">1381</td>
+<td align="center">1381</td>
+<td align="center">900</td>
+<td align="center">3</td>
+<td align="center">1991-2003</td>
+</tr>
+<tr class="even">
+<td align="center">Chisomo Sandwe Game Management Area</td>
+<td align="center">2100</td>
+<td align="center">2100</td>
+<td align="center">3450;750</td>
+<td align="center">2</td>
+<td align="center">1994-1999</td>
+</tr>
+<tr class="odd">
+<td align="center">Isangano National Park</td>
+<td align="center">840</td>
+<td align="center">840</td>
+<td align="center">840</td>
+<td align="center">1</td>
+<td align="center">1993-1993</td>
+</tr>
+<tr class="even">
+<td align="center">Kafue National Park</td>
+<td align="center">21612</td>
+<td align="center">21612</td>
+<td align="center">22400</td>
+<td align="center">7</td>
+<td align="center">1979-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Kasonso-Busanga</td>
+<td align="center">7478</td>
+<td align="center">7478</td>
+<td align="center">7780</td>
+<td align="center">3</td>
+<td align="center">1997-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Kotakota Game Ranch</td>
+<td align="center">17</td>
+<td align="center">17</td>
+<td align="center">17</td>
+<td align="center">1</td>
+<td align="center">1991-1991</td>
+</tr>
+<tr class="odd">
+<td align="center">Lavushi Manda National Park</td>
+<td align="center">1500</td>
+<td align="center">1500</td>
+<td align="center">1500</td>
+<td align="center">1</td>
+<td align="center">1991-1991</td>
+</tr>
+<tr class="even">
+<td align="center">Lower Zambezi</td>
+<td align="center">3699</td>
+<td align="center">3699</td>
+<td align="center">4092</td>
+<td align="center">4</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Luambe</td>
+<td align="center">332</td>
+<td align="center">332</td>
+<td align="center">331</td>
+<td align="center">3</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Luano Game Management Area</td>
+<td align="center">8930</td>
+<td align="center">8930</td>
+<td align="center">8930</td>
+<td align="center">2</td>
+<td align="center">1991-1996</td>
+</tr>
+<tr class="odd">
+<td align="center">Lukusuzi National Park</td>
+<td align="center">2585</td>
+<td align="center">2585</td>
+<td align="center">2611;2610</td>
+<td align="center">4</td>
+<td align="center">1994-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Lumimba</td>
+<td align="center">2878</td>
+<td align="center">2878</td>
+<td align="center">2700</td>
+<td align="center">5</td>
+<td align="center">1994-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Lunga Luswishi</td>
+<td align="center">13370</td>
+<td align="center">13370</td>
+<td align="center">13340</td>
+<td align="center">4</td>
+<td align="center">1991-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Lupande Game Management Area</td>
+<td align="center">4756</td>
+<td align="center">4756</td>
+<td align="center">4840</td>
+<td align="center">4</td>
+<td align="center">1993-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Mosi-oa-Tunya National Park</td>
+<td align="center">66</td>
+<td align="center">66</td>
+<td align="center">66</td>
+<td align="center">3</td>
+<td align="center">1991-2008</td>
+</tr>
+<tr class="even">
+<td align="center">Mukungule Game Management Area</td>
+<td align="center">1504</td>
+<td align="center">1504</td>
+<td align="center">1815</td>
+<td align="center">3</td>
+<td align="center">2001-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Mulobezi Game Management Area</td>
+<td align="center">3480</td>
+<td align="center">3480</td>
+<td align="center">3420</td>
+<td align="center">3</td>
+<td align="center">1997-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Mumbwa</td>
+<td align="center">2902</td>
+<td align="center">2902</td>
+<td align="center">3370</td>
+<td align="center">5</td>
+<td align="center">1991-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Munyamadzi</td>
+<td align="center">1958</td>
+<td align="center">1958</td>
+<td align="center">1092</td>
+<td align="center">7</td>
+<td align="center">1994-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Musalangu Game Management Area</td>
+<td align="center">12632</td>
+<td align="center">17350</td>
+<td align="center">17350</td>
+<td align="center">5</td>
+<td align="center">1991-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Namwala</td>
+<td align="center">2434</td>
+<td align="center">2434</td>
+<td align="center">3161</td>
+<td align="center">3</td>
+<td align="center">2000-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Nkala Game Management Area</td>
+<td align="center">202</td>
+<td align="center">202</td>
+<td align="center">194;211</td>
+<td align="center">2</td>
+<td align="center">2004-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">North Luangwa</td>
+<td align="center">4629</td>
+<td align="center">4629</td>
+<td align="center">4636</td>
+<td align="center">7</td>
+<td align="center">1979-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Nsumbu National Park</td>
+<td align="center">2049</td>
+<td align="center">2049</td>
+<td align="center">2063</td>
+<td align="center">3</td>
+<td align="center">1991-2003</td>
+</tr>
+<tr class="odd">
+<td align="center">Rufunsa Game Management Area</td>
+<td align="center">2728</td>
+<td align="center">2728</td>
+<td align="center">2328;3128</td>
+<td align="center">2</td>
+<td align="center">1996-2003</td>
+</tr>
+<tr class="even">
+<td align="center">Sandwe Game Management Area</td>
+<td align="center">1432</td>
+<td align="center">1432</td>
+<td align="center">1500</td>
+<td align="center">3</td>
+<td align="center">1994-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Sekula</td>
+<td align="center">8</td>
+<td align="center">8</td>
+<td align="center">10;7</td>
+<td align="center">2</td>
+<td align="center">1991-2008</td>
+</tr>
+<tr class="even">
+<td align="center">Sichifulo Game Management Area</td>
+<td align="center">4371</td>
+<td align="center">7383</td>
+<td align="center">3600</td>
+<td align="center">4</td>
+<td align="center">1991-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Sioma Ngwezi National Park</td>
+<td align="center">4853</td>
+<td align="center">4853</td>
+<td align="center">5276</td>
+<td align="center">4</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="even">
+<td align="center">South Luangwa National Park</td>
+<td align="center">8156</td>
+<td align="center">8156</td>
+<td align="center">9050</td>
+<td align="center">6</td>
+<td align="center">1979-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Tanganyika Ecosystem</td>
+<td align="center">7660</td>
+<td align="center">7660</td>
+<td align="center">7274</td>
+<td align="center">3</td>
+<td align="center">2003-2016</td>
+</tr>
+<tr class="even">
+<td align="center">West Lunga National Park</td>
+<td align="center">1684</td>
+<td align="center">1684</td>
+<td align="center">1684</td>
+<td align="center">3</td>
+<td align="center">1991-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">West Petauke Game Management Area</td>
+<td align="center">2651</td>
+<td align="center">4140</td>
+<td align="center">3842</td>
+<td align="center">4</td>
+<td align="center">1994-2009</td>
+</tr>
+<tr class="even">
+<td align="center">West Zambezi</td>
+<td align="center">7143</td>
+<td align="center">7143</td>
+<td align="center">7143</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Mozambique (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Banhine National Park</td>
+<td align="center">6673</td>
+<td align="center">6673</td>
+<td align="center">6510</td>
+<td align="center">3</td>
+<td align="center">2002-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Cabo Delgado Province</td>
+<td align="center">11062</td>
+<td align="center">11062</td>
+<td align="center">11062</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Cabora Bassa North</td>
+<td align="center">3368</td>
+<td align="center">3368</td>
+<td align="center">3708;3028</td>
+<td align="center">2</td>
+<td align="center">2003-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Chipanje Chetu</td>
+<td align="center">6641</td>
+<td align="center">6641</td>
+<td align="center">6641</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Gile National Reserve</td>
+<td align="center">2278</td>
+<td align="center">2278</td>
+<td align="center">2100;2456</td>
+<td align="center">2</td>
+<td align="center">2002-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Gorongosa National Park</td>
+<td align="center">2821</td>
+<td align="center">3689</td>
+<td align="center">3689</td>
+<td align="center">4</td>
+<td align="center">1994-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Limpopo Extension</td>
+<td align="center">3240</td>
+<td align="center">3240</td>
+<td align="center">3240</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Limpopo National Park</td>
+<td align="center">10493</td>
+<td align="center">10493</td>
+<td align="center">10000</td>
+<td align="center">4</td>
+<td align="center">2002-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Magoe</td>
+<td align="center">2834</td>
+<td align="center">3815</td>
+<td align="center">2621</td>
+<td align="center">5</td>
+<td align="center">1995-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Maputo Elephant Reserve and Futi Corridor</td>
+<td align="center">861</td>
+<td align="center">861</td>
+<td align="center">900</td>
+<td align="center">5</td>
+<td align="center">1977-2008</td>
+</tr>
+<tr class="odd">
+<td align="center">Marromeu Game Reserve</td>
+<td align="center">1706</td>
+<td align="center">1706</td>
+<td align="center">1104;2307</td>
+<td align="center">2</td>
+<td align="center">1995-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Massangena West</td>
+<td align="center">2620</td>
+<td align="center">4000</td>
+<td align="center">2286</td>
+<td align="center">3</td>
+<td align="center">1973-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Mecuburi Forest Reserve</td>
+<td align="center">195</td>
+<td align="center">195</td>
+<td align="center">195</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Moribane-Chimanimani Forest Reserve</td>
+<td align="center">185</td>
+<td align="center">185</td>
+<td align="center">185</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="odd">
+<td align="center">Niassa</td>
+<td align="center">37782</td>
+<td align="center">37782</td>
+<td align="center">42341;42295</td>
+<td align="center">6</td>
+<td align="center">1995-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Niassa Adjacent Blocks</td>
+<td align="center">6698</td>
+<td align="center">6698</td>
+<td align="center">6700;6697</td>
+<td align="center">2</td>
+<td align="center">2009-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Palma</td>
+<td align="center">3816</td>
+<td align="center">3816</td>
+<td align="center">3816</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Quirimbas Corridor</td>
+<td align="center">3605</td>
+<td align="center">3605</td>
+<td align="center">3605</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Quirimbas National Park</td>
+<td align="center">10534</td>
+<td align="center">10534</td>
+<td align="center">9770;11298</td>
+<td align="center">2</td>
+<td align="center">2011-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Tete Province-South</td>
+<td align="center">14500</td>
+<td align="center">14500</td>
+<td align="center">14500</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Liberia (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Sapo</td>
+<td align="center">961</td>
+<td align="center">961</td>
+<td align="center">1292;630</td>
+<td align="center">2</td>
+<td align="center">1989-2009</td>
+</tr>
+<tr class="even">
+<td align="center">Wenegisi</td>
+<td align="center">130</td>
+<td align="center">130</td>
+<td align="center">130</td>
+<td align="center">2</td>
+<td align="center">1990-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Gabon (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bateke</td>
+<td align="center">2042</td>
+<td align="center">2042</td>
+<td align="center">2042</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Birougou</td>
+<td align="center">1332</td>
+<td align="center">1332</td>
+<td align="center">1332</td>
+<td align="center">1</td>
+<td align="center">2007-2007</td>
+</tr>
+<tr class="odd">
+<td align="center">Djouah Belinga</td>
+<td align="center">4339</td>
+<td align="center">4339</td>
+<td align="center">4339</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Evaro</td>
+<td align="center">2365</td>
+<td align="center">2365</td>
+<td align="center">2365</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Gamba complex</td>
+<td align="center">7470</td>
+<td align="center">7470</td>
+<td align="center">10485;4456</td>
+<td align="center">2</td>
+<td align="center">1999-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Ivindo</td>
+<td align="center">3670</td>
+<td align="center">3670</td>
+<td align="center">3475;3864</td>
+<td align="center">2</td>
+<td align="center">2005-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">Kivoro</td>
+<td align="center">2337</td>
+<td align="center">2337</td>
+<td align="center">2337</td>
+<td align="center">1</td>
+<td align="center">2008-2008</td>
+</tr>
+<tr class="even">
+<td align="center">Loango</td>
+<td align="center">1510</td>
+<td align="center">1510</td>
+<td align="center">1510</td>
+<td align="center">1</td>
+<td align="center">2007-2007</td>
+</tr>
+<tr class="odd">
+<td align="center">Lope</td>
+<td align="center">6266</td>
+<td align="center">6266</td>
+<td align="center">4486</td>
+<td align="center">5</td>
+<td align="center">1998-2009</td>
+</tr>
+<tr class="even">
+<td align="center">Mayombe</td>
+<td align="center">1682</td>
+<td align="center">1682</td>
+<td align="center">1682</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Mayumba</td>
+<td align="center">161</td>
+<td align="center">161</td>
+<td align="center">161</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Minkebe</td>
+<td align="center">10638</td>
+<td align="center">10638</td>
+<td align="center">9320;11956</td>
+<td align="center">2</td>
+<td align="center">2004-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Moukalaba Doudou</td>
+<td align="center">609</td>
+<td align="center">609</td>
+<td align="center">609</td>
+<td align="center">1</td>
+<td align="center">2011-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Mt de Cristal</td>
+<td align="center">3692</td>
+<td align="center">3692</td>
+<td align="center">2083;5300</td>
+<td align="center">2</td>
+<td align="center">2001-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Mwagna</td>
+<td align="center">935</td>
+<td align="center">935</td>
+<td align="center">1166</td>
+<td align="center">3</td>
+<td align="center">2001-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Mwagna buffer</td>
+<td align="center">2020</td>
+<td align="center">2020</td>
+<td align="center">2020</td>
+<td align="center">1</td>
+<td align="center">2004-2004</td>
+</tr>
+<tr class="odd">
+<td align="center">Pongara</td>
+<td align="center">378</td>
+<td align="center">378</td>
+<td align="center">378</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Waka</td>
+<td align="center">1061</td>
+<td align="center">1061</td>
+<td align="center">1061</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Wonga Wongue</td>
+<td align="center">4967</td>
+<td align="center">4967</td>
+<td align="center">4967</td>
+<td align="center">2</td>
+<td align="center">2011-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Cameroon (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Benoue</td>
+<td align="center">2006</td>
+<td align="center">2444</td>
+<td align="center">1800</td>
+<td align="center">4</td>
+<td align="center">1977-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Bouba Ndjidah</td>
+<td align="center">2215</td>
+<td align="center">2215</td>
+<td align="center">2200</td>
+<td align="center">4</td>
+<td align="center">1977-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Faro National Park</td>
+<td align="center">3624</td>
+<td align="center">3624</td>
+<td align="center">3486</td>
+<td align="center">3</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Sudanian Area</td>
+<td align="center">17002</td>
+<td align="center">24985</td>
+<td align="center">14300</td>
+<td align="center">3</td>
+<td align="center">1991-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Waza National Park</td>
+<td align="center">1741</td>
+<td align="center">1741</td>
+<td align="center">1700</td>
+<td align="center">5</td>
+<td align="center">1977-2007</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for DRC (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bili-Uere</td>
+<td align="center">18194</td>
+<td align="center">18194</td>
+<td align="center">9550</td>
+<td align="center">3</td>
+<td align="center">1976-2012</td>
+</tr>
+<tr class="even">
+<td align="center">Garamba</td>
+<td align="center">8609</td>
+<td align="center">15872</td>
+<td align="center">5525;7699</td>
+<td align="center">6</td>
+<td align="center">1976-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Kahuzi</td>
+<td align="center">5849</td>
+<td align="center">15570</td>
+<td align="center">6000</td>
+<td align="center">5</td>
+<td align="center">1977-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Kivu</td>
+<td align="center">62414</td>
+<td align="center">62414</td>
+<td align="center">62414</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="odd">
+<td align="center">Lomako</td>
+<td align="center">61825</td>
+<td align="center">61825</td>
+<td align="center">122444;1206</td>
+<td align="center">2</td>
+<td align="center">2002-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Luama-Itombwe</td>
+<td align="center">41000</td>
+<td align="center">41000</td>
+<td align="center">72532;9469</td>
+<td align="center">2</td>
+<td align="center">2002-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Maiko</td>
+<td align="center">10815</td>
+<td align="center">10815</td>
+<td align="center">10800;10830</td>
+<td align="center">2</td>
+<td align="center">1992-2005</td>
+</tr>
+<tr class="even">
+<td align="center">Ngiri</td>
+<td align="center">32006</td>
+<td align="center">32006</td>
+<td align="center">32006</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="odd">
+<td align="center">Okapi</td>
+<td align="center">16874</td>
+<td align="center">30000</td>
+<td align="center">13726</td>
+<td align="center">5</td>
+<td align="center">1989-2011</td>
+</tr>
+<tr class="even">
+<td align="center">Rubi-Tele</td>
+<td align="center">35776</td>
+<td align="center">35776</td>
+<td align="center">68453;3100</td>
+<td align="center">2</td>
+<td align="center">2002-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Salonga</td>
+<td align="center">39422</td>
+<td align="center">49690</td>
+<td align="center">36000</td>
+<td align="center">4</td>
+<td align="center">1979-2004</td>
+</tr>
+<tr class="even">
+<td align="center">Sankuru</td>
+<td align="center">23161</td>
+<td align="center">23161</td>
+<td align="center">23161</td>
+<td align="center">1</td>
+<td align="center">2009-2009</td>
+</tr>
+<tr class="odd">
+<td align="center">TL2</td>
+<td align="center">37172</td>
+<td align="center">37172</td>
+<td align="center">39517</td>
+<td align="center">3</td>
+<td align="center">1989-2008</td>
+</tr>
+<tr class="even">
+<td align="center">Upper Tshuapa</td>
+<td align="center">141048</td>
+<td align="center">141048</td>
+<td align="center">141048</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="odd">
+<td align="center">Virunga</td>
+<td align="center">5431</td>
+<td align="center">8000</td>
+<td align="center">4810</td>
+<td align="center">7</td>
+<td align="center">1977-2014</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Guinea Bissau (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Binasse</td>
+<td align="center">330</td>
+<td align="center">330</td>
+<td align="center">330</td>
+<td align="center">2</td>
+<td align="center">1991-2004</td>
+</tr>
+<tr class="even">
+<td align="center">Corubal Dulombi</td>
+<td align="center">1342</td>
+<td align="center">1342</td>
+<td align="center">1342</td>
+<td align="center">1</td>
+<td align="center">2004-2004</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Zimbabwe (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Binga Communal Lands</td>
+<td align="center">2349</td>
+<td align="center">2349</td>
+<td align="center">2217</td>
+<td align="center">4</td>
+<td align="center">1997-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Bubi Valley Conservancy</td>
+<td align="center">2895</td>
+<td align="center">2895</td>
+<td align="center">2895</td>
+<td align="center">1</td>
+<td align="center">2001-2001</td>
+</tr>
+<tr class="odd">
+<td align="center">Bubiana Conservancy</td>
+<td align="center">1275</td>
+<td align="center">1275</td>
+<td align="center">1275</td>
+<td align="center">1</td>
+<td align="center">1996-1996</td>
+</tr>
+<tr class="even">
+<td align="center">Chete Safari Area</td>
+<td align="center">1252</td>
+<td align="center">1252</td>
+<td align="center">1260</td>
+<td align="center">5</td>
+<td align="center">1993-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Chewore Safari Area</td>
+<td align="center">2438</td>
+<td align="center">2438</td>
+<td align="center">3303</td>
+<td align="center">3</td>
+<td align="center">2001-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Chiredzi River Conservancy</td>
+<td align="center">895</td>
+<td align="center">895</td>
+<td align="center">895</td>
+<td align="center">2</td>
+<td align="center">1996-2001</td>
+</tr>
+<tr class="odd">
+<td align="center">Chirisa Safari Area</td>
+<td align="center">1569</td>
+<td align="center">1569</td>
+<td align="center">1529</td>
+<td align="center">6</td>
+<td align="center">1978-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Chizarira National Park</td>
+<td align="center">2068</td>
+<td align="center">2068</td>
+<td align="center">2084</td>
+<td align="center">6</td>
+<td align="center">1976-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Dande</td>
+<td align="center">3822</td>
+<td align="center">3822</td>
+<td align="center">3822</td>
+<td align="center">1</td>
+<td align="center">1995-1995</td>
+</tr>
+<tr class="even">
+<td align="center">Doma Safari Area</td>
+<td align="center">970</td>
+<td align="center">970</td>
+<td align="center">975</td>
+<td align="center">3</td>
+<td align="center">1995-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Fuller Forest Land</td>
+<td align="center">10000</td>
+<td align="center">10000</td>
+<td align="center">10000</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Gonarezhou National Park</td>
+<td align="center">5039</td>
+<td align="center">5039</td>
+<td align="center">4941</td>
+<td align="center">6</td>
+<td align="center">1975-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Gwaai Bembesi Umguza Forest Lands</td>
+<td align="center">1442</td>
+<td align="center">1442</td>
+<td align="center">1442</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Hartley Safari Area</td>
+<td align="center">511</td>
+<td align="center">511</td>
+<td align="center">445</td>
+<td align="center">3</td>
+<td align="center">1993-2001</td>
+</tr>
+<tr class="odd">
+<td align="center">Home Farm Greystone Ranches</td>
+<td align="center">60</td>
+<td align="center">60</td>
+<td align="center">60</td>
+<td align="center">1</td>
+<td align="center">2001-2001</td>
+</tr>
+<tr class="even">
+<td align="center">Hwange</td>
+<td align="center">14698</td>
+<td align="center">14698</td>
+<td align="center">15219</td>
+<td align="center">7</td>
+<td align="center">1977-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Kariba Communal Areas</td>
+<td align="center">3216</td>
+<td align="center">3216</td>
+<td align="center">3224</td>
+<td align="center">4</td>
+<td align="center">1997-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Kavira Forest Land</td>
+<td align="center">287</td>
+<td align="center">287</td>
+<td align="center">287</td>
+<td align="center">1</td>
+<td align="center">2001-2001</td>
+</tr>
+<tr class="odd">
+<td align="center">Lusulu</td>
+<td align="center">540</td>
+<td align="center">540</td>
+<td align="center">543;537</td>
+<td align="center">2</td>
+<td align="center">2001-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Mahenye Ward</td>
+<td align="center">221</td>
+<td align="center">221</td>
+<td align="center">221</td>
+<td align="center">4</td>
+<td align="center">1996-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Malapati Safari Area</td>
+<td align="center">176</td>
+<td align="center">176</td>
+<td align="center">177</td>
+<td align="center">3</td>
+<td align="center">2001-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Malilangwe Conservancy</td>
+<td align="center">424</td>
+<td align="center">424</td>
+<td align="center">424;425</td>
+<td align="center">2</td>
+<td align="center">2001-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Mambali Communal Lands</td>
+<td align="center">327</td>
+<td align="center">327</td>
+<td align="center">327</td>
+<td align="center">1</td>
+<td align="center">2001-2001</td>
+</tr>
+<tr class="even">
+<td align="center">Mangwe Dam</td>
+<td align="center">291</td>
+<td align="center">291</td>
+<td align="center">291</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Maramani Communal Lands</td>
+<td align="center">364</td>
+<td align="center">364</td>
+<td align="center">367;361</td>
+<td align="center">2</td>
+<td align="center">2001-2010</td>
+</tr>
+<tr class="even">
+<td align="center">Matabeleland Communal Lands</td>
+<td align="center">2976</td>
+<td align="center">2976</td>
+<td align="center">3110</td>
+<td align="center">4</td>
+<td align="center">1994-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Matetsi Safari Complex</td>
+<td align="center">4396</td>
+<td align="center">4396</td>
+<td align="center">4399</td>
+<td align="center">5</td>
+<td align="center">1994-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Matibi II Communal Lands</td>
+<td align="center">400</td>
+<td align="center">400</td>
+<td align="center">400</td>
+<td align="center">1</td>
+<td align="center">1996-1996</td>
+</tr>
+<tr class="odd">
+<td align="center">Matusadona National Park</td>
+<td align="center">1385</td>
+<td align="center">1385</td>
+<td align="center">1413</td>
+<td align="center">7</td>
+<td align="center">1976-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Mavuradonha Wilderness Area</td>
+<td align="center">629</td>
+<td align="center">629</td>
+<td align="center">617</td>
+<td align="center">3</td>
+<td align="center">1997-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Mukwiche Area</td>
+<td align="center">337</td>
+<td align="center">337</td>
+<td align="center">337</td>
+<td align="center">2</td>
+<td align="center">2001-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Ngamo Sikumi Forest</td>
+<td align="center">2342</td>
+<td align="center">2342</td>
+<td align="center">2344</td>
+<td align="center">5</td>
+<td align="center">1994-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">North Gokwe Communal Lands</td>
+<td align="center">3086</td>
+<td align="center">3086</td>
+<td align="center">3082</td>
+<td align="center">4</td>
+<td align="center">1997-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Nuanetsi Ranch</td>
+<td align="center">10000</td>
+<td align="center">10000</td>
+<td align="center">10000</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Nyatana Wildlife Management Area</td>
+<td align="center">652</td>
+<td align="center">652</td>
+<td align="center">653;651</td>
+<td align="center">2</td>
+<td align="center">2001-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Rest of Zambezi valley</td>
+<td align="center">11720</td>
+<td align="center">11720</td>
+<td align="center">11720</td>
+<td align="center">1</td>
+<td align="center">2014-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Save Valley Conservancy</td>
+<td align="center">3354</td>
+<td align="center">3354</td>
+<td align="center">3484</td>
+<td align="center">5</td>
+<td align="center">1996-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Sengwe Communal Land</td>
+<td align="center">2488</td>
+<td align="center">2488</td>
+<td align="center">2488</td>
+<td align="center">1</td>
+<td align="center">2013-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Sentinel Nottingham Ranches</td>
+<td align="center">664</td>
+<td align="center">664</td>
+<td align="center">568;760</td>
+<td align="center">2</td>
+<td align="center">2001-2010</td>
+</tr>
+<tr class="even">
+<td align="center">Shangani Ranch</td>
+<td align="center">628</td>
+<td align="center">628</td>
+<td align="center">628</td>
+<td align="center">1</td>
+<td align="center">2001-2001</td>
+</tr>
+<tr class="odd">
+<td align="center">Sijarira Forest Area</td>
+<td align="center">266</td>
+<td align="center">266</td>
+<td align="center">270</td>
+<td align="center">5</td>
+<td align="center">1993-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Tuli Safari Area</td>
+<td align="center">932</td>
+<td align="center">2640</td>
+<td align="center">416</td>
+<td align="center">6</td>
+<td align="center">1979-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Victoria Falls NP</td>
+<td align="center">562</td>
+<td align="center">562</td>
+<td align="center">562</td>
+<td align="center">1</td>
+<td align="center">1976-1976</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Uganda (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bugungu Wildlife Reserve</td>
+<td align="center">490</td>
+<td align="center">490</td>
+<td align="center">490</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Bwindi Impenetrable Forest National Park</td>
+<td align="center">339</td>
+<td align="center">339</td>
+<td align="center">336</td>
+<td align="center">4</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Elephant Sancturary</td>
+<td align="center">3520</td>
+<td align="center">3520</td>
+<td align="center">3520</td>
+<td align="center">1</td>
+<td align="center">1976-1976</td>
+</tr>
+<tr class="even">
+<td align="center">Karenga Community Wildlife area</td>
+<td align="center">956</td>
+<td align="center">956</td>
+<td align="center">956</td>
+<td align="center">1</td>
+<td align="center">2012-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Karuma Wildlife Reserve</td>
+<td align="center">415</td>
+<td align="center">415</td>
+<td align="center">415</td>
+<td align="center">1</td>
+<td align="center">2002-2002</td>
+</tr>
+<tr class="even">
+<td align="center">Katonga Game Reserve</td>
+<td align="center">446</td>
+<td align="center">909</td>
+<td align="center">214</td>
+<td align="center">3</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Kibale National Park</td>
+<td align="center">870</td>
+<td align="center">870</td>
+<td align="center">946;795</td>
+<td align="center">4</td>
+<td align="center">1994-2010</td>
+</tr>
+<tr class="even">
+<td align="center">Kidepo Valley National Park</td>
+<td align="center">1580</td>
+<td align="center">1580</td>
+<td align="center">1442</td>
+<td align="center">6</td>
+<td align="center">1976-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Kigezi Wildlife Reserve</td>
+<td align="center">850</td>
+<td align="center">850</td>
+<td align="center">850</td>
+<td align="center">1</td>
+<td align="center">1995-1995</td>
+</tr>
+<tr class="even">
+<td align="center">Luwero</td>
+<td align="center">510</td>
+<td align="center">510</td>
+<td align="center">510</td>
+<td align="center">1</td>
+<td align="center">1998-1998</td>
+</tr>
+<tr class="odd">
+<td align="center">Madi East</td>
+<td align="center">10000</td>
+<td align="center">10000</td>
+<td align="center">10000</td>
+<td align="center">1</td>
+<td align="center">2009-2009</td>
+</tr>
+<tr class="even">
+<td align="center">Mgahinga Gorilla National Park</td>
+<td align="center">59</td>
+<td align="center">67</td>
+<td align="center">67</td>
+<td align="center">3</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Mount Elgon National Park UG</td>
+<td align="center">1117</td>
+<td align="center">1117</td>
+<td align="center">1117</td>
+<td align="center">1</td>
+<td align="center">1995-1995</td>
+</tr>
+<tr class="even">
+<td align="center">Murchison Falls National Park Ecosystem</td>
+<td align="center">4315</td>
+<td align="center">6235</td>
+<td align="center">4064</td>
+<td align="center">8</td>
+<td align="center">1966-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Otze Forest</td>
+<td align="center">200</td>
+<td align="center">200</td>
+<td align="center">200</td>
+<td align="center">1</td>
+<td align="center">2004-2004</td>
+</tr>
+<tr class="even">
+<td align="center">Queen Elizabeth Conservation Area</td>
+<td align="center">2419</td>
+<td align="center">2419</td>
+<td align="center">2259</td>
+<td align="center">5</td>
+<td align="center">1992-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Rwenzori National Park</td>
+<td align="center">1848</td>
+<td align="center">3560</td>
+<td align="center">1054</td>
+<td align="center">3</td>
+<td align="center">1976-2003</td>
+</tr>
+<tr class="even">
+<td align="center">Sango Bay</td>
+<td align="center">305</td>
+<td align="center">305</td>
+<td align="center">305</td>
+<td align="center">3</td>
+<td align="center">1995-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Toro Semliki Valley Wildlife Reserve</td>
+<td align="center">592</td>
+<td align="center">592</td>
+<td align="center">542;784</td>
+<td align="center">4</td>
+<td align="center">1995-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for DRC (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Bushimae</td>
+<td align="center">5051</td>
+<td align="center">5051</td>
+<td align="center">5232;4870</td>
+<td align="center">2</td>
+<td align="center">1987-2010</td>
+</tr>
+<tr class="even">
+<td align="center">Swa Kibula</td>
+<td align="center">12326</td>
+<td align="center">12326</td>
+<td align="center">12326</td>
+<td align="center">1</td>
+<td align="center">2012-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Upemba</td>
+<td align="center">10685</td>
+<td align="center">10685</td>
+<td align="center">10000;11370</td>
+<td align="center">2</td>
+<td align="center">1979-2011</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Namibia (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Caprivi Zambezi Region</td>
+<td align="center">16523</td>
+<td align="center">16523</td>
+<td align="center">18259;17943</td>
+<td align="center">6</td>
+<td align="center">1993-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Etosha National Park</td>
+<td align="center">19756</td>
+<td align="center">19756</td>
+<td align="center">18551;19356</td>
+<td align="center">6</td>
+<td align="center">1990-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Khaudom - Kavango</td>
+<td align="center">11671</td>
+<td align="center">21950</td>
+<td align="center">12107;10485</td>
+<td align="center">6</td>
+<td align="center">1990-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Kunene</td>
+<td align="center">44530</td>
+<td align="center">86451</td>
+<td align="center">40887</td>
+<td align="center">5</td>
+<td align="center">1992-2011</td>
+</tr>
+<tr class="odd">
+<td align="center">Mangetti</td>
+<td align="center">1660</td>
+<td align="center">1660</td>
+<td align="center">762;2558</td>
+<td align="center">2</td>
+<td align="center">2005-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Nyae Nyae Conservancy</td>
+<td align="center">5917</td>
+<td align="center">7794</td>
+<td align="center">7001</td>
+<td align="center">3</td>
+<td align="center">2004-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Botswana (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Chobe</td>
+<td align="center">11412</td>
+<td align="center">11412</td>
+<td align="center">11675</td>
+<td align="center">8</td>
+<td align="center">1973-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Ghanzi District</td>
+<td align="center">51269</td>
+<td align="center">51269</td>
+<td align="center">51269</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Northern Botswana excluding Chobe</td>
+<td align="center">91899</td>
+<td align="center">91899</td>
+<td align="center">111247;86712</td>
+<td align="center">6</td>
+<td align="center">1975-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Okavango</td>
+<td align="center">22720</td>
+<td align="center">22720</td>
+<td align="center">17160</td>
+<td align="center">3</td>
+<td align="center">1975-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Tuli</td>
+<td align="center">1558</td>
+<td align="center">1558</td>
+<td align="center">1250;1320</td>
+<td align="center">6</td>
+<td align="center">1976-2014</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Eritrea (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Gash-Setit</td>
+<td align="center">3873</td>
+<td align="center">3873</td>
+<td align="center">5275</td>
+<td align="center">5</td>
+<td align="center">1993-2014</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Nigeria (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Gashaka Gumti</td>
+<td align="center">5910</td>
+<td align="center">5910</td>
+<td align="center">5860;5960</td>
+<td align="center">2</td>
+<td align="center">2002-2010</td>
+</tr>
+<tr class="even">
+<td align="center">Kambari</td>
+<td align="center">2000</td>
+<td align="center">2000</td>
+<td align="center">2000</td>
+<td align="center">2</td>
+<td align="center">1998-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Kamuku</td>
+<td align="center">2855</td>
+<td align="center">2855</td>
+<td align="center">2855</td>
+<td align="center">1</td>
+<td align="center">2015-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Kwiambana</td>
+<td align="center">1715</td>
+<td align="center">1715</td>
+<td align="center">1715</td>
+<td align="center">1</td>
+<td align="center">1993-1993</td>
+</tr>
+<tr class="odd">
+<td align="center">Lake Chad</td>
+<td align="center">1573</td>
+<td align="center">1573</td>
+<td align="center">2160</td>
+<td align="center">3</td>
+<td align="center">1976-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Madagali and Kopre</td>
+<td align="center">5600</td>
+<td align="center">5600</td>
+<td align="center">5600</td>
+<td align="center">1</td>
+<td align="center">1996-1996</td>
+</tr>
+<tr class="odd">
+<td align="center">Marguba</td>
+<td align="center">710</td>
+<td align="center">710</td>
+<td align="center">710</td>
+<td align="center">1</td>
+<td align="center">2006-2006</td>
+</tr>
+<tr class="even">
+<td align="center">Sambisa</td>
+<td align="center">582</td>
+<td align="center">582</td>
+<td align="center">518;647</td>
+<td align="center">2</td>
+<td align="center">1993-2006</td>
+</tr>
+<tr class="odd">
+<td align="center">Yankari</td>
+<td align="center">2313</td>
+<td align="center">2313</td>
+<td align="center">2244</td>
+<td align="center">5</td>
+<td align="center">1977-2011</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Mali (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Gourma</td>
+<td align="center">218958</td>
+<td align="center">1302888</td>
+<td align="center">37991</td>
+<td align="center">7</td>
+<td align="center">1977-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Mali-Guinea Border</td>
+<td align="center">3628</td>
+<td align="center">3628</td>
+<td align="center">3628</td>
+<td align="center">1</td>
+<td align="center">1992-1992</td>
+</tr>
+<tr class="odd">
+<td align="center">Soussan Forest Reserve</td>
+<td align="center">241</td>
+<td align="center">241</td>
+<td align="center">241</td>
+<td align="center">1</td>
+<td align="center">1989-1989</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Swaziland (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Hlane Royal National Park</td>
+<td align="center">140</td>
+<td align="center">140</td>
+<td align="center">142</td>
+<td align="center">6</td>
+<td align="center">1989-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Malolotja Nature Reserve</td>
+<td align="center">70</td>
+<td align="center">154</td>
+<td align="center">28</td>
+<td align="center">3</td>
+<td align="center">1993-2012</td>
+</tr>
+<tr class="odd">
+<td align="center">Mkhaya Nature Reserve</td>
+<td align="center">64</td>
+<td align="center">64</td>
+<td align="center">65</td>
+<td align="center">6</td>
+<td align="center">1989-2015</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Malawi (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Kasungu National Park</td>
+<td align="center">2838</td>
+<td align="center">2838</td>
+<td align="center">2316</td>
+<td align="center">5</td>
+<td align="center">1977-2014</td>
+</tr>
+<tr class="even">
+<td align="center">Liwonde National Park</td>
+<td align="center">577</td>
+<td align="center">577</td>
+<td align="center">548</td>
+<td align="center">4</td>
+<td align="center">1992-2014</td>
+</tr>
+<tr class="odd">
+<td align="center">Majete Wildlife Reserve</td>
+<td align="center">620</td>
+<td align="center">860</td>
+<td align="center">860</td>
+<td align="center">3</td>
+<td align="center">2006-2015</td>
+</tr>
+<tr class="even">
+<td align="center">Nkhota-Kota Wildlife Reserve</td>
+<td align="center">1450</td>
+<td align="center">1802</td>
+<td align="center">1802</td>
+<td align="center">3</td>
+<td align="center">1992-2013</td>
+</tr>
+<tr class="odd">
+<td align="center">Nyika National Park</td>
+<td align="center">1729</td>
+<td align="center">1729</td>
+<td align="center">1679</td>
+<td align="center">3</td>
+<td align="center">1992-2013</td>
+</tr>
+<tr class="even">
+<td align="center">Phirilongwe and Thuma</td>
+<td align="center">610</td>
+<td align="center">610</td>
+<td align="center">640</td>
+<td align="center">4</td>
+<td align="center">1998-2015</td>
+</tr>
+<tr class="odd">
+<td align="center">Vwaza Marsh Wildlife Reserve</td>
+<td align="center">982</td>
+<td align="center">982</td>
+<td align="center">986</td>
+<td align="center">4</td>
+<td align="center">1992-2013</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Senegal (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Niokolo Koba</td>
+<td align="center">8480</td>
+<td align="center">8480</td>
+<td align="center">8282</td>
+<td align="center">5</td>
+<td align="center">1977-2012</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Guinea (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Oure Kaba</td>
+<td align="center">691</td>
+<td align="center">691</td>
+<td align="center">691</td>
+<td align="center">1</td>
+<td align="center">2007-2007</td>
+</tr>
+<tr class="even">
+<td align="center">Ziama</td>
+<td align="center">968</td>
+<td align="center">1171</td>
+<td align="center">1123</td>
+<td align="center">4</td>
+<td align="center">1997-2011</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Equatorial Guinea (cyclotis)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Rio Muni</td>
+<td align="center">12918</td>
+<td align="center">12918</td>
+<td align="center">1200;24635</td>
+<td align="center">2</td>
+<td align="center">2004-2011</td>
+</tr>
+</tbody>
+</table>
+<p>[1] “Summary data for Somalia (africana)”</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">zone</th>
+<th align="center">mean_area</th>
+<th align="center">mean_revised_area</th>
+<th align="center">modal_area</th>
+<th align="center">n_surveys</th>
+<th align="center">yrs_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Somalia</td>
+<td align="center">31000</td>
+<td align="center">31000</td>
+<td align="center">31000</td>
+<td align="center">2</td>
+<td align="center">1975-1995</td>
+</tr>
+</tbody>
+</table>
+<p>Melt list</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>dat &lt;-<span class="st"> </span><span class="kw">ldply</span>(dat_clean, <span class="dt">.id =</span> <span class="st">&quot;country&quot;</span>)</span></code></pre></div>
+<p>Coerce factors</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>dat<span class="op">$</span>region &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>region)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>dat<span class="op">$</span>subregion &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>subregion)</span>
+<span id="cb7-3"><a href="#cb7-3"></a>dat<span class="op">$</span>country &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>country)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>dat<span class="op">$</span>zone &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat<span class="op">$</span>zone)</span></code></pre></div>
+<p>Delete sites with all zero</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>dfr &lt;-<span class="st"> </span><span class="kw">ddply</span>(dat, .(zone), summarize, <span class="dt">allzero =</span> <span class="kw">all</span>(estimate <span class="op">==</span><span class="st"> </span><span class="dv">0</span>))</span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>dfr &lt;-<span class="st"> </span><span class="kw">subset</span>(dfr, <span class="op">!</span>allzero)</span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a>dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, zone <span class="op">%in%</span><span class="st"> </span>dfr<span class="op">$</span>zone)</span></code></pre></div>
+<p>Write .csv file</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">write.csv</span>(dat, <span class="dt">file =</span> <span class="st">&quot;GLOBAL_AED_1979_2016.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<p>Save to package data</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># save clean data</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>AED &lt;-<span class="st"> </span>dat</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">rm</span>(dat)</span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">suppressMessages</span>(usethis<span class="op">::</span><span class="kw">use_data</span>(AED, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

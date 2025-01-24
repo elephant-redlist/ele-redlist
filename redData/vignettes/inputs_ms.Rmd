@@ -1,0 +1,577 @@
+---
+title: "Data preparation for manuscript"
+author: "Charles T T Edwards (Wellington, New Zealand)"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: no
+vignette: >
+  %\VignetteIndexEntry{inputsManuscript}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.width = 6, tidy = TRUE, tidy.opts = list(blank = TRUE, width.cutoff = 95), message = FALSE, warning = FALSE, collapse = TRUE, comment = "#>")
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+```{r}
+library(plyr)
+library(redData)
+```
+
+# Preliminaries
+
+Load data and subset.
+```{r}
+data(AED)
+
+dat_global <- AED[, c('region', 'subregion', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys')]
+```
+
+```{r, echo = FALSE}
+# clean out two records with unusually high survey areas
+
+# raw data record to be deleted:
+# max,2016,N,africana,Mali,Gourma extreme area,Gourma,O,D,2015,51,1287763
+loc <- which(with(dat_global, zone == "Gourma" & survey_area == "1302888"))
+dat_global[loc, c("estimate", "survey_area", "density")] <- c(253, 15125, 253 / 15125)
+loc <- which(with(AED, zone == "Gourma"))
+dat_global[loc, "n_surveys"] <- 6
+
+# raw data record to be deleted?
+#,1979,S,africana,Angola,Southern/Mupa,Southern Mupa,,,1978,7400,240024
+#loc <- which(with(dat_global, zone == "Southern Mupa" & survey_area == "240024"))
+
+# for some reason this site doesn't work
+dat_global <- subset(dat_global, zone != "MPD area")
+```
+
+# Forest
+```{r}
+dat <- subset(dat_global, region == 'forest')
+
+# start of model in year before
+# first data year
+year_start <- min(dat$year) - 1L
+```
+
+```{r}
+# year labels for plotting
+dat$year_label <- dat$year
+
+# year = 0 corresponds to start 
+# of model
+dat$year <- dat$year - year_start
+
+# data years all > 0
+stopifnot(all(dat$year > 0))
+
+# year covariate
+years       <- 0:max(dat$year)
+year_labels <- year_start:max(dat$year_label)
+
+stopifnot(length(years) == length(year_labels))
+
+# zones for each country and region
+number_zones_per_country <- apply(with(dat, table(country, zone) > 0), 1, sum)
+number_zones_per_region  <- apply(with(dat, table(subregion, zone) > 0), 1, sum)
+
+zones_per_country <- dlply(dat, .(country), summarize, zones = as.character(unique(zone)))
+zones_per_country <- lapply(zones_per_country, function(x) x[,1])
+
+zones_per_region <- dlply(dat, .(subregion, country), summarize, zones = as.character(unique(zone)))
+zones_per_region <- lapply(names(number_zones_per_region), function(x) as.character(unlist(zones_per_region[grep(x, names(zones_per_region))])))
+names(zones_per_region) <- names(number_zones_per_region)
+
+stopifnot(all(names(zones_per_country) == names(number_zones_per_country)))
+stopifnot(all(number_zones_per_country == unlist(lapply(zones_per_country, length))))
+
+stopifnot(all(names(zones_per_region) == names(number_zones_per_region)))
+stopifnot(all(number_zones_per_region == unlist(lapply(zones_per_region, length))))
+
+# order data by subregion, country then zone
+dat <- dat[order(dat$subregion, dat$country, dat$zone),]
+
+# extract vector of countries
+countries <- names(zones_per_country)
+
+# extract regions
+regions <- names(zones_per_region)
+
+# check that order of zones in 'zones_per_country' matches
+# the ordering of the zones in 'dat'
+for (i in countries) {
+    
+    tmp <- subset(dat, country == i)
+    
+    stopifnot(all(unique(tmp$zone) == zones_per_country[[i]]))
+    stopifnot(length(unique(tmp$zone)) == number_zones_per_country[i])
+}
+
+# check that order of zones in 'zones_per_region' matches
+# the ordering of the zones in 'dat'
+for (i in regions) {
+    
+    tmp <- subset(dat, subregion == i)
+    
+    stopifnot(all(unique(tmp$zone) == zones_per_region[[i]]))
+    stopifnot(length(unique(tmp$zone)) == number_zones_per_region[i])
+}
+
+# extract ordered vector of zones
+zones <- unique(dat$zone)
+
+# dimensions
+N <- nrow(dat)
+Y <- length(years)
+S <- length(zones)
+S.country <- as.integer(number_zones_per_country)
+S.region  <- as.integer(number_zones_per_region)
+C <- length(countries)
+R <- length(regions)
+
+stopifnot(length(S.country) == C)
+stopifnot(length(S.region)  == R)
+stopifnot(sum(S.country) == length(zones))
+stopifnot(sum(S.region)  == length(zones))
+
+# look-up vectors for survey data
+X   <- list()
+X$Y <- match(dat$year, years)
+X$S <- match(dat$zone, zones)
+X$C <- match(dat$country, countries)
+X$R <- match(dat$subregion, regions)
+
+# check numbers match
+stopifnot(all(table(X$C) == table(dat$country)[countries]))
+stopifnot(all(table(X$R) == table(dat$subregion)[regions]))
+stopifnot(all(table(X$S) == table(dat$zone)[zones]))
+
+# check again
+for (i in 1:nrow(dat)) {
+    
+    stopifnot(dat$country[i]   == countries[X$C[i]])
+    stopifnot(dat$zone[i]      == zones[X$S[i]])
+    stopifnot(dat$subregion[i] == regions[X$R[i]])
+}
+
+# check
+stopifnot(all(dat$year == years[X$Y]))
+stopifnot(all(dat$zone == zones[X$S]))
+stopifnot(all(dat$country == countries[X$C]))
+stopifnot(all(dat$subregion == regions[X$R]))
+
+# make area sizes
+areas <- merge(expand.grid(year = years, zone = zones), dat[, c('year', 'zone', 'survey_area')], all = TRUE)
+areas <- reshape2::acast(areas, year~zone, fun.aggregate = function(x) mean(x, na.rm = TRUE), value.var = 'survey_area', fill = as.numeric(NA), drop = FALSE)
+
+areas <- apply(areas, 2, redData::fill, complete = TRUE)
+
+stopifnot(all(colnames(areas) == zones))
+
+# get modal areas per zone
+modal_areas <- data.frame(zone = dat$zone, modal_survey_area = dat$modal_survey_area)[!duplicated(data.frame(dat$zone, dat$modal_survey_area)),]
+modal_areas <- modal_areas[match(zones, modal_areas$zone),]
+stopifnot(all(modal_areas$zone == zones))
+stopifnot(nrow(modal_areas) == S)
+
+modal_areas$max_modal_survey_area <- numeric(S)
+for (i in 1:S) {
+    modal_areas$max_modal_survey_area[i] <- max(as.numeric(unlist(strsplit(as.character(modal_areas[i,2]), ";"))))
+}
+
+# save regression input data
+reg_dat_forest <- list(N = N, Y = Y, S = list("global" = S, "by_region" = S.region, "by_country" = S.country), C = C, R = R, 
+                       XY = X$Y, XC = X$C, XS = X$S, XR = X$R,
+                       y = dat$estimate, 
+                       survey_area = t(areas),
+                       years = year_labels,
+                       regions = regions,
+                       countries = countries,
+                       sites = zones)
+
+dat_forest <- dat
+                
+usethis::use_data(reg_dat_forest, overwrite = TRUE)
+usethis::use_data(dat_forest, overwrite = TRUE)
+```
+
+# Savannah
+```{r}
+dat <- subset(dat_global, region == 'savannah')
+
+# start of model in year before
+# first data year
+year_start <- min(dat$year) - 1L
+```
+
+```{r}
+# year labels for plotting
+dat$year_label <- dat$year
+
+# year = 0 corresponds to start 
+# of model
+dat$year <- dat$year - year_start
+
+# data years all > 0
+stopifnot(all(dat$year > 0))
+
+# year covariate
+years       <- 0:max(dat$year)
+year_labels <- year_start:max(dat$year_label)
+
+stopifnot(length(years) == length(year_labels))
+
+# zones for each country and region
+number_zones_per_country <- apply(with(dat, table(country, zone) > 0), 1, sum)
+number_zones_per_region  <- apply(with(dat, table(subregion, zone) > 0), 1, sum)
+
+zones_per_country <- dlply(dat, .(country), summarize, zones = as.character(unique(zone)))
+zones_per_country <- lapply(zones_per_country, function(x) x[,1])
+
+zones_per_region <- dlply(dat, .(subregion, country), summarize, zones = as.character(unique(zone)))
+zones_per_region <- lapply(names(number_zones_per_region), function(x) as.character(unlist(zones_per_region[grep(x, names(zones_per_region))])))
+names(zones_per_region) <- names(number_zones_per_region)
+
+stopifnot(all(names(zones_per_country) == names(number_zones_per_country)))
+stopifnot(all(number_zones_per_country == unlist(lapply(zones_per_country, length))))
+
+stopifnot(all(names(zones_per_region) == names(number_zones_per_region)))
+stopifnot(all(number_zones_per_region == unlist(lapply(zones_per_region, length))))
+
+# order data by subregion, country then zone
+dat <- dat[order(dat$subregion, dat$country, dat$zone),]
+
+# extract vector of countries
+countries <- names(zones_per_country)
+
+# extract regions
+regions <- names(zones_per_region)
+
+# check that order of zones in 'zones_per_country' matches
+# the ordering of the zones in 'dat'
+for (i in countries) {
+    
+    tmp <- subset(dat, country == i)
+    
+    stopifnot(all(unique(tmp$zone) == zones_per_country[[i]]))
+    stopifnot(length(unique(tmp$zone)) == number_zones_per_country[i])
+}
+
+# check that order of zones in 'zones_per_region' matches
+# the ordering of the zones in 'dat'
+for (i in regions) {
+    
+    tmp <- subset(dat, subregion == i)
+    
+    stopifnot(all(unique(tmp$zone) == zones_per_region[[i]]))
+    stopifnot(length(unique(tmp$zone)) == number_zones_per_region[i])
+}
+
+# extract ordered vector of zones
+zones <- unique(dat$zone)
+
+# dimensions
+N <- nrow(dat)
+Y <- length(years)
+S <- length(zones)
+S.country <- as.integer(number_zones_per_country)
+S.region  <- as.integer(number_zones_per_region)
+C <- length(countries)
+R <- length(regions)
+
+stopifnot(length(S.country) == C)
+stopifnot(length(S.region)  == R)
+stopifnot(sum(S.country) == length(zones))
+stopifnot(sum(S.region)  == length(zones))
+
+# look-up vectors for survey data
+X   <- list()
+X$Y <- match(dat$year, years)
+X$S <- match(dat$zone, zones)
+X$C <- match(dat$country, countries)
+X$R <- match(dat$subregion, regions)
+
+# check numbers match
+stopifnot(all(table(X$C) == table(dat$country)[countries]))
+stopifnot(all(table(X$R) == table(dat$subregion)[regions]))
+stopifnot(all(table(X$S) == table(dat$zone)[zones]))
+
+# check again
+for (i in 1:nrow(dat)) {
+    
+    stopifnot(dat$country[i]   == countries[X$C[i]])
+    stopifnot(dat$zone[i]      == zones[X$S[i]])
+    stopifnot(dat$subregion[i] == regions[X$R[i]])
+}
+
+# check
+stopifnot(all(dat$year == years[X$Y]))
+stopifnot(all(dat$zone == zones[X$S]))
+stopifnot(all(dat$country == countries[X$C]))
+stopifnot(all(dat$subregion == regions[X$R]))
+
+# make area sizes
+areas <- merge(expand.grid(year = years, zone = zones), dat[, c('year', 'zone', 'survey_area')], all = TRUE)
+areas <- reshape2::acast(areas, year~zone, fun.aggregate = function(x) mean(x, na.rm = TRUE), value.var = 'survey_area', fill = as.numeric(NA), drop = FALSE)
+
+areas <- apply(areas, 2, redData::fill, complete = TRUE)
+
+stopifnot(all(colnames(areas) == zones))
+
+# get modal areas per zone
+modal_areas <- data.frame(zone = dat$zone, modal_survey_area = dat$modal_survey_area)[!duplicated(data.frame(dat$zone, dat$modal_survey_area)),]
+modal_areas <- modal_areas[match(zones, modal_areas$zone),]
+stopifnot(all(modal_areas$zone == zones))
+stopifnot(nrow(modal_areas) == S)
+
+modal_areas$max_modal_survey_area <- numeric(S)
+for (i in 1:S) {
+    modal_areas$max_modal_survey_area[i] <- max(as.numeric(unlist(strsplit(as.character(modal_areas[i,2]), ";"))))
+}
+```
+
+```{r}
+# save regression input data
+reg_dat_savannah <- list(N = N, Y = Y, S = list("global" = S, "by_region" = S.region, "by_country" = S.country), C = C, R = R, 
+                         XY = X$Y, XC = X$C, XS = X$S, XR = X$R,
+                         y = dat$estimate, 
+                         survey_area = t(areas),
+                         years = year_labels,
+                         regions = regions,
+                         countries = countries,
+                         sites = zones)
+          
+dat_savannah <- dat    
+
+usethis::use_data(reg_dat_savannah, overwrite = TRUE)
+usethis::use_data(dat_savannah, overwrite = TRUE)
+```
+
+# Global
+```{r}
+dat <- dat_global
+
+# start of model in year before
+# first data year
+year_start <- min(dat$year) - 1L
+```
+
+```{r}
+# year labels for plotting
+dat$year_label <- dat$year
+
+# year = 0 corresponds to start 
+# of model
+dat$year <- dat$year - year_start
+
+# data years all > 0
+stopifnot(all(dat$year > 0))
+
+# year covariate
+years       <- 0:max(dat$year)
+year_labels <- year_start:max(dat$year_label)
+
+stopifnot(length(years) == length(year_labels))
+
+# zones for each country / region / species
+zones_per_country <- dlply(dat, .(country), summarize, zones = as.character(unique(zone)))
+zones_per_country <- lapply(zones_per_country, function(x) x[,1])
+
+zones_per_region <- dlply(dat, .(subregion), summarize, zones = as.character(unique(zone)))
+zones_per_region <- lapply(zones_per_region, function(x) x[,1])
+
+zones_per_species <- dlply(dat, .(region), summarize, zones = as.character(unique(zone)))
+zones_per_species <- lapply(zones_per_species, function(x) x[,1])
+
+# order zones by species / region / country
+# (assign regions / species / country to each zone)
+dfr <- data.frame(species = NA, region = NA, country = NA, zone = as.character(unlist(zones_per_country)))
+
+for (i in names(zones_per_country)) {
+  
+  dfr$country[dfr$zone %in% zones_per_country[[i]]] <- i
+}
+
+for (i in names(zones_per_region)) {
+  
+  dfr$region[dfr$zone %in% zones_per_region[[i]]] <- i
+}
+
+for (i in names(zones_per_species)) {
+  
+  dfr$species[dfr$zone %in% zones_per_species[[i]]] <- i
+}
+
+# (manual ordering)
+dfr <- split(dfr, ~ species)
+dfr[["savannah"]] <- split(dfr[["savannah"]], ~ region)
+dfr[["savannah"]] <- rbind(dfr[["savannah"]][["east"]], dfr[["savannah"]][["north"]], dfr[["savannah"]][["south"]])
+dfr <- rbind(dfr[["forest"]], dfr[["savannah"]])
+
+# (create ordered factors)
+dfr$species <- factor(dfr$species, levels = unique(dfr$species))
+dfr$region  <- factor(dfr$region,  levels = unique(dfr$region))
+dfr$country <- factor(dfr$country, levels = unique(dfr$country))
+
+# re-create ordered vectors
+zones_per_species <- lapply(split(dfr, ~ species), function(x) x$zone)
+zones_per_region  <- lapply(split(dfr, ~ region),  function(x) x$zone)
+zones_per_country <- lapply(split(dfr, ~ country), function(x) x$zone)
+
+# count zones
+number_zones_per_country <- unlist(lapply(zones_per_country, length))
+number_zones_per_region  <- unlist(lapply(zones_per_region,  length))
+number_zones_per_species <- unlist(lapply(zones_per_species, length))
+
+# checks
+stopifnot(all(names(zones_per_country) == names(number_zones_per_country)))
+stopifnot(all(number_zones_per_country == unlist(lapply(zones_per_country, length))))
+
+stopifnot(all(names(zones_per_region) == names(number_zones_per_region)))
+stopifnot(all(number_zones_per_region == unlist(lapply(zones_per_region, length))))
+
+stopifnot(all(names(zones_per_species) == names(number_zones_per_species)))
+stopifnot(all(number_zones_per_species == unlist(lapply(zones_per_species, length))))
+
+# extract vector of zones
+zones <- dfr$zone
+
+# extract vector of countries
+countries <- levels(dfr$country)
+
+# extract regions
+regions <- levels(dfr$region)
+
+# extract species
+species <- levels(dfr$species)
+
+# checks
+stopifnot(all(countries == names(zones_per_country)))
+stopifnot(all(regions   == names(zones_per_region)))
+stopifnot(all(species   == names(zones_per_species)))
+
+# check all zones present
+for (i in countries) {
+    
+    tmp <- subset(dat, country == i)
+    
+    stopifnot(all(tmp$zone %in% zones_per_country[[i]]))
+    stopifnot(length(unique(tmp$zone)) == number_zones_per_country[i])
+}
+
+# check all zones present
+for (i in regions) {
+    
+    tmp <- subset(dat, subregion == i)
+    
+    stopifnot(all(tmp$zone %in% zones_per_region[[i]]))
+    stopifnot(length(unique(tmp$zone)) == number_zones_per_region[i])
+}
+
+# check all zones present
+for (i in species) {
+    
+    tmp <- subset(dat, region == i)
+    
+    stopifnot(all(tmp$zone %in% zones_per_species[[i]]))
+    stopifnot(length(unique(tmp$zone)) == number_zones_per_species[i])
+}
+
+# order raw data by (now ordered) zones
+surveys_per_zone <- table(dat$zone)
+dat <- dat[order(match(dat$zone, zones)),]
+
+# check
+stopifnot(all(table(dat$zone) == surveys_per_zone))
+
+# dimensions
+N <- nrow(dat)
+Y <- length(years)
+S <- length(zones)
+S.country <- as.integer(number_zones_per_country)
+S.region  <- as.integer(number_zones_per_region)
+S.species <- as.integer(number_zones_per_species)
+C <- length(countries)
+R <- length(regions)
+G <- length(species)
+
+stopifnot(length(S.country) == C)
+stopifnot(length(S.region)  == R)
+stopifnot(length(S.species)  == G)
+stopifnot(sum(S.country) == length(zones))
+stopifnot(sum(S.region)  == length(zones))
+stopifnot(sum(S.species)  == length(zones))
+
+# look-up vectors for survey data
+X   <- list()
+X$Y <- match(dat$year, years)
+X$S <- match(dat$zone, zones)
+X$C <- match(dat$country, countries)
+X$R <- match(dat$subregion, regions)
+X$G <- match(dat$region, species)
+
+# check numbers match
+stopifnot(all(table(X$C) == table(dat$country)[countries]))
+stopifnot(all(table(X$R) == table(dat$subregion)[regions]))
+stopifnot(all(table(X$G) == table(dat$region)[species]))
+stopifnot(all(table(X$S) == table(dat$zone)[zones]))
+
+# check again
+for (i in 1:nrow(dat)) {
+    
+    stopifnot(dat$country[i]   == countries[X$C[i]])
+    stopifnot(dat$zone[i]      == zones[X$S[i]])
+    stopifnot(dat$subregion[i] == regions[X$R[i]])
+    stopifnot(dat$region[i] == species[X$G[i]])
+}
+
+# check
+stopifnot(all(dat$year == years[X$Y]))
+stopifnot(all(dat$zone == zones[X$S]))
+stopifnot(all(dat$country == countries[X$C]))
+stopifnot(all(dat$subregion == regions[X$R]))
+stopifnot(all(dat$region == species[X$G]))
+
+# make area sizes
+areas <- merge(expand.grid(year = years, zone = zones), dat[, c('year', 'zone', 'survey_area')], all = TRUE)
+areas <- reshape2::acast(areas, year~zone, fun.aggregate = function(x) mean(x, na.rm = TRUE), value.var = 'survey_area', fill = as.numeric(NA), drop = FALSE)
+
+areas <- apply(areas, 2, redData::fill, complete = TRUE)
+
+stopifnot(all(colnames(areas) == zones))
+
+# get modal areas per zone
+modal_areas <- data.frame(zone = dat$zone, modal_survey_area = dat$modal_survey_area)[!duplicated(data.frame(dat$zone, dat$modal_survey_area)),]
+modal_areas <- modal_areas[match(zones, modal_areas$zone),]
+stopifnot(all(modal_areas$zone == zones))
+stopifnot(nrow(modal_areas) == S)
+
+modal_areas$max_modal_survey_area <- numeric(S)
+for (i in 1:S) {
+    modal_areas$max_modal_survey_area[i] <- max(as.numeric(unlist(strsplit(as.character(modal_areas[i,2]), ";"))))
+}
+```
+
+```{r}
+# save regression input data
+reg_dat_global <- list(N = N, Y = Y, S = list("global" = S, "by_region" = S.region, "by_country" = S.country, "by_species" = S.species), C = C, R = R, G = G,
+                       XY = X$Y, XC = X$C, XS = X$S, XR = X$R, XG = X$G,
+                       y = dat$estimate, 
+                       survey_area = t(areas),
+                       years = year_labels,
+                       regions = regions,
+                       species = species,
+                       countries = countries,
+                       sites = zones)
+
+dat_global <- dat
+                
+usethis::use_data(reg_dat_global, overwrite = TRUE)
+usethis::use_data(dat_global, overwrite = TRUE)
+```
+
+

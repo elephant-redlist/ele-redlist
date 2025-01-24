@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Charles T T Edwards (Wellington, New Zealand)" />
+
+<meta name="date" content="2021-09-10" />
+
+<title>Data preparation for manuscript</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Data preparation for manuscript</h1>
+<h4 class="author">Charles T T Edwards (Wellington, New Zealand)</h4>
+<h4 class="date">2021-09-10</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(plyr)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(redData)</span></code></pre></div>
+<div id="preliminaries" class="section level1">
+<h1>Preliminaries</h1>
+<p>Load data and subset.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">data</span>(AED)</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a>dat_global &lt;-<span class="st"> </span>AED[, <span class="kw">c</span>(<span class="st">&quot;region&quot;</span>, <span class="st">&quot;subregion&quot;</span>, <span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;zone&quot;</span>, <span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;survey_area&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="st">&quot;modal_survey_area&quot;</span>, <span class="st">&quot;density&quot;</span>, <span class="st">&quot;n_surveys&quot;</span>)]</span></code></pre></div>
+</div>
+<div id="forest" class="section level1">
+<h1>Forest</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat_global, region <span class="op">==</span><span class="st"> &quot;forest&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co"># start of model in year before first data year</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>year_start &lt;-<span class="st"> </span><span class="kw">min</span>(dat<span class="op">$</span>year) <span class="op">-</span><span class="st"> </span>1L</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># year labels for plotting</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>dat<span class="op">$</span>year_label &lt;-<span class="st"> </span>dat<span class="op">$</span>year</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># year = 0 corresponds to start of model</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>dat<span class="op">$</span>year &lt;-<span class="st"> </span>dat<span class="op">$</span>year <span class="op">-</span><span class="st"> </span>year_start</span>
+<span id="cb4-6"><a href="#cb4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co"># data years all &gt; 0</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>year <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>))</span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># year covariate</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>years &lt;-<span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="kw">max</span>(dat<span class="op">$</span>year)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>year_labels &lt;-<span class="st"> </span>year_start<span class="op">:</span><span class="kw">max</span>(dat<span class="op">$</span>year_label)</span>
+<span id="cb4-13"><a href="#cb4-13"></a></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(years) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(year_labels))</span>
+<span id="cb4-15"><a href="#cb4-15"></a></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co"># zones for each country and region</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>number_zones_per_country &lt;-<span class="st"> </span><span class="kw">apply</span>(<span class="kw">with</span>(dat, <span class="kw">table</span>(country, zone) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>), <span class="dv">1</span>, sum)</span>
+<span id="cb4-18"><a href="#cb4-18"></a>number_zones_per_region &lt;-<span class="st"> </span><span class="kw">apply</span>(<span class="kw">with</span>(dat, <span class="kw">table</span>(subregion, zone) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>), <span class="dv">1</span>, sum)</span>
+<span id="cb4-19"><a href="#cb4-19"></a></span>
+<span id="cb4-20"><a href="#cb4-20"></a>zones_per_country &lt;-<span class="st"> </span><span class="kw">dlply</span>(dat, .(country), summarize, <span class="dt">zones =</span> <span class="kw">as.character</span>(<span class="kw">unique</span>(zone)))</span>
+<span id="cb4-21"><a href="#cb4-21"></a>zones_per_country &lt;-<span class="st"> </span><span class="kw">lapply</span>(zones_per_country, <span class="cf">function</span>(x) x[, <span class="dv">1</span>])</span>
+<span id="cb4-22"><a href="#cb4-22"></a></span>
+<span id="cb4-23"><a href="#cb4-23"></a>zones_per_region &lt;-<span class="st"> </span><span class="kw">dlply</span>(dat, .(subregion, country), summarize, <span class="dt">zones =</span> <span class="kw">as.character</span>(<span class="kw">unique</span>(zone)))</span>
+<span id="cb4-24"><a href="#cb4-24"></a>zones_per_region &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(number_zones_per_region), <span class="cf">function</span>(x) <span class="kw">as.character</span>(<span class="kw">unlist</span>(zones_per_region[<span class="kw">grep</span>(x,</span>
+<span id="cb4-25"><a href="#cb4-25"></a>    <span class="kw">names</span>(zones_per_region))])))</span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="kw">names</span>(zones_per_region) &lt;-<span class="st"> </span><span class="kw">names</span>(number_zones_per_region)</span>
+<span id="cb4-27"><a href="#cb4-27"></a></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">names</span>(zones_per_country) <span class="op">==</span><span class="st"> </span><span class="kw">names</span>(number_zones_per_country)))</span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(number_zones_per_country <span class="op">==</span><span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(zones_per_country, length))))</span>
+<span id="cb4-30"><a href="#cb4-30"></a></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">names</span>(zones_per_region) <span class="op">==</span><span class="st"> </span><span class="kw">names</span>(number_zones_per_region)))</span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(number_zones_per_region <span class="op">==</span><span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(zones_per_region, length))))</span>
+<span id="cb4-33"><a href="#cb4-33"></a></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co"># order data by subregion, country then zone</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a>dat &lt;-<span class="st"> </span>dat[<span class="kw">order</span>(dat<span class="op">$</span>subregion, dat<span class="op">$</span>country, dat<span class="op">$</span>zone), ]</span>
+<span id="cb4-36"><a href="#cb4-36"></a></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co"># extract vector of countries</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a>countries &lt;-<span class="st"> </span><span class="kw">names</span>(zones_per_country)</span>
+<span id="cb4-39"><a href="#cb4-39"></a></span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co"># extract regions</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a>regions &lt;-<span class="st"> </span><span class="kw">names</span>(zones_per_region)</span>
+<span id="cb4-42"><a href="#cb4-42"></a></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co"># check that order of zones in &#39;zones_per_country&#39; matches the ordering of the zones in &#39;dat&#39;</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
+<span id="cb4-45"><a href="#cb4-45"></a></span>
+<span id="cb4-46"><a href="#cb4-46"></a>    tmp &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, country <span class="op">==</span><span class="st"> </span>i)</span>
+<span id="cb4-47"><a href="#cb4-47"></a></span>
+<span id="cb4-48"><a href="#cb4-48"></a>    <span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone) <span class="op">==</span><span class="st"> </span>zones_per_country[[i]]))</span>
+<span id="cb4-49"><a href="#cb4-49"></a>    <span class="kw">stopifnot</span>(<span class="kw">length</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone)) <span class="op">==</span><span class="st"> </span>number_zones_per_country[i])</span>
+<span id="cb4-50"><a href="#cb4-50"></a>}</span>
+<span id="cb4-51"><a href="#cb4-51"></a></span>
+<span id="cb4-52"><a href="#cb4-52"></a><span class="co"># check that order of zones in &#39;zones_per_region&#39; matches the ordering of the zones in &#39;dat&#39;</span></span>
+<span id="cb4-53"><a href="#cb4-53"></a><span class="cf">for</span> (i <span class="cf">in</span> regions) {</span>
+<span id="cb4-54"><a href="#cb4-54"></a></span>
+<span id="cb4-55"><a href="#cb4-55"></a>    tmp &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, subregion <span class="op">==</span><span class="st"> </span>i)</span>
+<span id="cb4-56"><a href="#cb4-56"></a></span>
+<span id="cb4-57"><a href="#cb4-57"></a>    <span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone) <span class="op">==</span><span class="st"> </span>zones_per_region[[i]]))</span>
+<span id="cb4-58"><a href="#cb4-58"></a>    <span class="kw">stopifnot</span>(<span class="kw">length</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone)) <span class="op">==</span><span class="st"> </span>number_zones_per_region[i])</span>
+<span id="cb4-59"><a href="#cb4-59"></a>}</span>
+<span id="cb4-60"><a href="#cb4-60"></a></span>
+<span id="cb4-61"><a href="#cb4-61"></a><span class="co"># extract ordered vector of zones</span></span>
+<span id="cb4-62"><a href="#cb4-62"></a>zones &lt;-<span class="st"> </span><span class="kw">unique</span>(dat<span class="op">$</span>zone)</span>
+<span id="cb4-63"><a href="#cb4-63"></a></span>
+<span id="cb4-64"><a href="#cb4-64"></a><span class="co"># dimensions</span></span>
+<span id="cb4-65"><a href="#cb4-65"></a>N &lt;-<span class="st"> </span><span class="kw">nrow</span>(dat)</span>
+<span id="cb4-66"><a href="#cb4-66"></a>Y &lt;-<span class="st"> </span><span class="kw">length</span>(years)</span>
+<span id="cb4-67"><a href="#cb4-67"></a>S &lt;-<span class="st"> </span><span class="kw">length</span>(zones)</span>
+<span id="cb4-68"><a href="#cb4-68"></a>S.country &lt;-<span class="st"> </span><span class="kw">as.integer</span>(number_zones_per_country)</span>
+<span id="cb4-69"><a href="#cb4-69"></a>S.region &lt;-<span class="st"> </span><span class="kw">as.integer</span>(number_zones_per_region)</span>
+<span id="cb4-70"><a href="#cb4-70"></a>C &lt;-<span class="st"> </span><span class="kw">length</span>(countries)</span>
+<span id="cb4-71"><a href="#cb4-71"></a>R &lt;-<span class="st"> </span><span class="kw">length</span>(regions)</span>
+<span id="cb4-72"><a href="#cb4-72"></a></span>
+<span id="cb4-73"><a href="#cb4-73"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(S.country) <span class="op">==</span><span class="st"> </span>C)</span>
+<span id="cb4-74"><a href="#cb4-74"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(S.region) <span class="op">==</span><span class="st"> </span>R)</span>
+<span id="cb4-75"><a href="#cb4-75"></a><span class="kw">stopifnot</span>(<span class="kw">sum</span>(S.country) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(zones))</span>
+<span id="cb4-76"><a href="#cb4-76"></a><span class="kw">stopifnot</span>(<span class="kw">sum</span>(S.region) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(zones))</span>
+<span id="cb4-77"><a href="#cb4-77"></a></span>
+<span id="cb4-78"><a href="#cb4-78"></a><span class="co"># look-up vectors for survey data</span></span>
+<span id="cb4-79"><a href="#cb4-79"></a>X &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb4-80"><a href="#cb4-80"></a>X<span class="op">$</span>Y &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>year, years)</span>
+<span id="cb4-81"><a href="#cb4-81"></a>X<span class="op">$</span>S &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>zone, zones)</span>
+<span id="cb4-82"><a href="#cb4-82"></a>X<span class="op">$</span>C &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>country, countries)</span>
+<span id="cb4-83"><a href="#cb4-83"></a>X<span class="op">$</span>R &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>subregion, regions)</span>
+<span id="cb4-84"><a href="#cb4-84"></a></span>
+<span id="cb4-85"><a href="#cb4-85"></a><span class="co"># check numbers match</span></span>
+<span id="cb4-86"><a href="#cb4-86"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>C) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>country)[countries]))</span>
+<span id="cb4-87"><a href="#cb4-87"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>R) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>subregion)[regions]))</span>
+<span id="cb4-88"><a href="#cb4-88"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>S) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>zone)[zones]))</span>
+<span id="cb4-89"><a href="#cb4-89"></a></span>
+<span id="cb4-90"><a href="#cb4-90"></a><span class="co"># check again</span></span>
+<span id="cb4-91"><a href="#cb4-91"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(dat)) {</span>
+<span id="cb4-92"><a href="#cb4-92"></a></span>
+<span id="cb4-93"><a href="#cb4-93"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>country[i] <span class="op">==</span><span class="st"> </span>countries[X<span class="op">$</span>C[i]])</span>
+<span id="cb4-94"><a href="#cb4-94"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>zone[i] <span class="op">==</span><span class="st"> </span>zones[X<span class="op">$</span>S[i]])</span>
+<span id="cb4-95"><a href="#cb4-95"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>subregion[i] <span class="op">==</span><span class="st"> </span>regions[X<span class="op">$</span>R[i]])</span>
+<span id="cb4-96"><a href="#cb4-96"></a>}</span>
+<span id="cb4-97"><a href="#cb4-97"></a></span>
+<span id="cb4-98"><a href="#cb4-98"></a><span class="co"># check</span></span>
+<span id="cb4-99"><a href="#cb4-99"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>years[X<span class="op">$</span>Y]))</span>
+<span id="cb4-100"><a href="#cb4-100"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>zone <span class="op">==</span><span class="st"> </span>zones[X<span class="op">$</span>S]))</span>
+<span id="cb4-101"><a href="#cb4-101"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>country <span class="op">==</span><span class="st"> </span>countries[X<span class="op">$</span>C]))</span>
+<span id="cb4-102"><a href="#cb4-102"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>subregion <span class="op">==</span><span class="st"> </span>regions[X<span class="op">$</span>R]))</span>
+<span id="cb4-103"><a href="#cb4-103"></a></span>
+<span id="cb4-104"><a href="#cb4-104"></a><span class="co"># make area sizes</span></span>
+<span id="cb4-105"><a href="#cb4-105"></a>areas &lt;-<span class="st"> </span><span class="kw">merge</span>(<span class="kw">expand.grid</span>(<span class="dt">year =</span> years, <span class="dt">zone =</span> zones), dat[, <span class="kw">c</span>(<span class="st">&quot;year&quot;</span>, <span class="st">&quot;zone&quot;</span>, <span class="st">&quot;survey_area&quot;</span>)],</span>
+<span id="cb4-106"><a href="#cb4-106"></a>    <span class="dt">all =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-107"><a href="#cb4-107"></a>areas &lt;-<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">acast</span>(areas, year <span class="op">~</span><span class="st"> </span>zone, <span class="dt">fun.aggregate =</span> <span class="cf">function</span>(x) <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</span>
+<span id="cb4-108"><a href="#cb4-108"></a>    <span class="dt">value.var =</span> <span class="st">&quot;survey_area&quot;</span>, <span class="dt">fill =</span> <span class="kw">as.numeric</span>(<span class="ot">NA</span>), <span class="dt">drop =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb4-109"><a href="#cb4-109"></a></span>
+<span id="cb4-110"><a href="#cb4-110"></a>areas &lt;-<span class="st"> </span><span class="kw">apply</span>(areas, <span class="dv">2</span>, redData<span class="op">::</span>fill, <span class="dt">complete =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-111"><a href="#cb4-111"></a></span>
+<span id="cb4-112"><a href="#cb4-112"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">colnames</span>(areas) <span class="op">==</span><span class="st"> </span>zones))</span>
+<span id="cb4-113"><a href="#cb4-113"></a></span>
+<span id="cb4-114"><a href="#cb4-114"></a><span class="co"># get modal areas per zone</span></span>
+<span id="cb4-115"><a href="#cb4-115"></a>modal_areas &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">zone =</span> dat<span class="op">$</span>zone, <span class="dt">modal_survey_area =</span> dat<span class="op">$</span>modal_survey_area)[<span class="op">!</span><span class="kw">duplicated</span>(<span class="kw">data.frame</span>(dat<span class="op">$</span>zone,</span>
+<span id="cb4-116"><a href="#cb4-116"></a>    dat<span class="op">$</span>modal_survey_area)), ]</span>
+<span id="cb4-117"><a href="#cb4-117"></a>modal_areas &lt;-<span class="st"> </span>modal_areas[<span class="kw">match</span>(zones, modal_areas<span class="op">$</span>zone), ]</span>
+<span id="cb4-118"><a href="#cb4-118"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(modal_areas<span class="op">$</span>zone <span class="op">==</span><span class="st"> </span>zones))</span>
+<span id="cb4-119"><a href="#cb4-119"></a><span class="kw">stopifnot</span>(<span class="kw">nrow</span>(modal_areas) <span class="op">==</span><span class="st"> </span>S)</span>
+<span id="cb4-120"><a href="#cb4-120"></a></span>
+<span id="cb4-121"><a href="#cb4-121"></a>modal_areas<span class="op">$</span>max_modal_survey_area &lt;-<span class="st"> </span><span class="kw">numeric</span>(S)</span>
+<span id="cb4-122"><a href="#cb4-122"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>S) {</span>
+<span id="cb4-123"><a href="#cb4-123"></a>    modal_areas<span class="op">$</span>max_modal_survey_area[i] &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">as.numeric</span>(<span class="kw">unlist</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(modal_areas[i,</span>
+<span id="cb4-124"><a href="#cb4-124"></a>        <span class="dv">2</span>]), <span class="st">&quot;;&quot;</span>))))</span>
+<span id="cb4-125"><a href="#cb4-125"></a>}</span>
+<span id="cb4-126"><a href="#cb4-126"></a></span>
+<span id="cb4-127"><a href="#cb4-127"></a><span class="co"># save regression input data</span></span>
+<span id="cb4-128"><a href="#cb4-128"></a>reg_dat_forest &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">N =</span> N, <span class="dt">Y =</span> Y, <span class="dt">S =</span> <span class="kw">list</span>(<span class="dt">global =</span> S, <span class="dt">by_region =</span> S.region, <span class="dt">by_country =</span> S.country),</span>
+<span id="cb4-129"><a href="#cb4-129"></a>    <span class="dt">C =</span> C, <span class="dt">R =</span> R, <span class="dt">XY =</span> X<span class="op">$</span>Y, <span class="dt">XC =</span> X<span class="op">$</span>C, <span class="dt">XS =</span> X<span class="op">$</span>S, <span class="dt">XR =</span> X<span class="op">$</span>R, <span class="dt">y =</span> dat<span class="op">$</span>estimate, <span class="dt">survey_area =</span> <span class="kw">t</span>(areas),</span>
+<span id="cb4-130"><a href="#cb4-130"></a>    <span class="dt">years =</span> year_labels, <span class="dt">regions =</span> regions, <span class="dt">countries =</span> countries, <span class="dt">sites =</span> zones)</span>
+<span id="cb4-131"><a href="#cb4-131"></a></span>
+<span id="cb4-132"><a href="#cb4-132"></a>dat_forest &lt;-<span class="st"> </span>dat</span>
+<span id="cb4-133"><a href="#cb4-133"></a></span>
+<span id="cb4-134"><a href="#cb4-134"></a>usethis<span class="op">::</span><span class="kw">use_data</span>(reg_dat_forest, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-135"><a href="#cb4-135"></a>usethis<span class="op">::</span><span class="kw">use_data</span>(dat_forest, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="savannah" class="section level1">
+<h1>Savannah</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat_global, region <span class="op">==</span><span class="st"> &quot;savannah&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co"># start of model in year before first data year</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>year_start &lt;-<span class="st"> </span><span class="kw">min</span>(dat<span class="op">$</span>year) <span class="op">-</span><span class="st"> </span>1L</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># year labels for plotting</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>dat<span class="op">$</span>year_label &lt;-<span class="st"> </span>dat<span class="op">$</span>year</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># year = 0 corresponds to start of model</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>dat<span class="op">$</span>year &lt;-<span class="st"> </span>dat<span class="op">$</span>year <span class="op">-</span><span class="st"> </span>year_start</span>
+<span id="cb6-6"><a href="#cb6-6"></a></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co"># data years all &gt; 0</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>year <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>))</span>
+<span id="cb6-9"><a href="#cb6-9"></a></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co"># year covariate</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>years &lt;-<span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="kw">max</span>(dat<span class="op">$</span>year)</span>
+<span id="cb6-12"><a href="#cb6-12"></a>year_labels &lt;-<span class="st"> </span>year_start<span class="op">:</span><span class="kw">max</span>(dat<span class="op">$</span>year_label)</span>
+<span id="cb6-13"><a href="#cb6-13"></a></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(years) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(year_labels))</span>
+<span id="cb6-15"><a href="#cb6-15"></a></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co"># zones for each country and region</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a>number_zones_per_country &lt;-<span class="st"> </span><span class="kw">apply</span>(<span class="kw">with</span>(dat, <span class="kw">table</span>(country, zone) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>), <span class="dv">1</span>, sum)</span>
+<span id="cb6-18"><a href="#cb6-18"></a>number_zones_per_region &lt;-<span class="st"> </span><span class="kw">apply</span>(<span class="kw">with</span>(dat, <span class="kw">table</span>(subregion, zone) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>), <span class="dv">1</span>, sum)</span>
+<span id="cb6-19"><a href="#cb6-19"></a></span>
+<span id="cb6-20"><a href="#cb6-20"></a>zones_per_country &lt;-<span class="st"> </span><span class="kw">dlply</span>(dat, .(country), summarize, <span class="dt">zones =</span> <span class="kw">as.character</span>(<span class="kw">unique</span>(zone)))</span>
+<span id="cb6-21"><a href="#cb6-21"></a>zones_per_country &lt;-<span class="st"> </span><span class="kw">lapply</span>(zones_per_country, <span class="cf">function</span>(x) x[, <span class="dv">1</span>])</span>
+<span id="cb6-22"><a href="#cb6-22"></a></span>
+<span id="cb6-23"><a href="#cb6-23"></a>zones_per_region &lt;-<span class="st"> </span><span class="kw">dlply</span>(dat, .(subregion, country), summarize, <span class="dt">zones =</span> <span class="kw">as.character</span>(<span class="kw">unique</span>(zone)))</span>
+<span id="cb6-24"><a href="#cb6-24"></a>zones_per_region &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(number_zones_per_region), <span class="cf">function</span>(x) <span class="kw">as.character</span>(<span class="kw">unlist</span>(zones_per_region[<span class="kw">grep</span>(x,</span>
+<span id="cb6-25"><a href="#cb6-25"></a>    <span class="kw">names</span>(zones_per_region))])))</span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="kw">names</span>(zones_per_region) &lt;-<span class="st"> </span><span class="kw">names</span>(number_zones_per_region)</span>
+<span id="cb6-27"><a href="#cb6-27"></a></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">names</span>(zones_per_country) <span class="op">==</span><span class="st"> </span><span class="kw">names</span>(number_zones_per_country)))</span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(number_zones_per_country <span class="op">==</span><span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(zones_per_country, length))))</span>
+<span id="cb6-30"><a href="#cb6-30"></a></span>
+<span id="cb6-31"><a href="#cb6-31"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">names</span>(zones_per_region) <span class="op">==</span><span class="st"> </span><span class="kw">names</span>(number_zones_per_region)))</span>
+<span id="cb6-32"><a href="#cb6-32"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(number_zones_per_region <span class="op">==</span><span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(zones_per_region, length))))</span>
+<span id="cb6-33"><a href="#cb6-33"></a></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="co"># order data by subregion, country then zone</span></span>
+<span id="cb6-35"><a href="#cb6-35"></a>dat &lt;-<span class="st"> </span>dat[<span class="kw">order</span>(dat<span class="op">$</span>subregion, dat<span class="op">$</span>country, dat<span class="op">$</span>zone), ]</span>
+<span id="cb6-36"><a href="#cb6-36"></a></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co"># extract vector of countries</span></span>
+<span id="cb6-38"><a href="#cb6-38"></a>countries &lt;-<span class="st"> </span><span class="kw">names</span>(zones_per_country)</span>
+<span id="cb6-39"><a href="#cb6-39"></a></span>
+<span id="cb6-40"><a href="#cb6-40"></a><span class="co"># extract regions</span></span>
+<span id="cb6-41"><a href="#cb6-41"></a>regions &lt;-<span class="st"> </span><span class="kw">names</span>(zones_per_region)</span>
+<span id="cb6-42"><a href="#cb6-42"></a></span>
+<span id="cb6-43"><a href="#cb6-43"></a><span class="co"># check that order of zones in &#39;zones_per_country&#39; matches the ordering of the zones in &#39;dat&#39;</span></span>
+<span id="cb6-44"><a href="#cb6-44"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
+<span id="cb6-45"><a href="#cb6-45"></a></span>
+<span id="cb6-46"><a href="#cb6-46"></a>    tmp &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, country <span class="op">==</span><span class="st"> </span>i)</span>
+<span id="cb6-47"><a href="#cb6-47"></a></span>
+<span id="cb6-48"><a href="#cb6-48"></a>    <span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone) <span class="op">==</span><span class="st"> </span>zones_per_country[[i]]))</span>
+<span id="cb6-49"><a href="#cb6-49"></a>    <span class="kw">stopifnot</span>(<span class="kw">length</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone)) <span class="op">==</span><span class="st"> </span>number_zones_per_country[i])</span>
+<span id="cb6-50"><a href="#cb6-50"></a>}</span>
+<span id="cb6-51"><a href="#cb6-51"></a></span>
+<span id="cb6-52"><a href="#cb6-52"></a><span class="co"># check that order of zones in &#39;zones_per_region&#39; matches the ordering of the zones in &#39;dat&#39;</span></span>
+<span id="cb6-53"><a href="#cb6-53"></a><span class="cf">for</span> (i <span class="cf">in</span> regions) {</span>
+<span id="cb6-54"><a href="#cb6-54"></a></span>
+<span id="cb6-55"><a href="#cb6-55"></a>    tmp &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, subregion <span class="op">==</span><span class="st"> </span>i)</span>
+<span id="cb6-56"><a href="#cb6-56"></a></span>
+<span id="cb6-57"><a href="#cb6-57"></a>    <span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone) <span class="op">==</span><span class="st"> </span>zones_per_region[[i]]))</span>
+<span id="cb6-58"><a href="#cb6-58"></a>    <span class="kw">stopifnot</span>(<span class="kw">length</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone)) <span class="op">==</span><span class="st"> </span>number_zones_per_region[i])</span>
+<span id="cb6-59"><a href="#cb6-59"></a>}</span>
+<span id="cb6-60"><a href="#cb6-60"></a></span>
+<span id="cb6-61"><a href="#cb6-61"></a><span class="co"># extract ordered vector of zones</span></span>
+<span id="cb6-62"><a href="#cb6-62"></a>zones &lt;-<span class="st"> </span><span class="kw">unique</span>(dat<span class="op">$</span>zone)</span>
+<span id="cb6-63"><a href="#cb6-63"></a></span>
+<span id="cb6-64"><a href="#cb6-64"></a><span class="co"># dimensions</span></span>
+<span id="cb6-65"><a href="#cb6-65"></a>N &lt;-<span class="st"> </span><span class="kw">nrow</span>(dat)</span>
+<span id="cb6-66"><a href="#cb6-66"></a>Y &lt;-<span class="st"> </span><span class="kw">length</span>(years)</span>
+<span id="cb6-67"><a href="#cb6-67"></a>S &lt;-<span class="st"> </span><span class="kw">length</span>(zones)</span>
+<span id="cb6-68"><a href="#cb6-68"></a>S.country &lt;-<span class="st"> </span><span class="kw">as.integer</span>(number_zones_per_country)</span>
+<span id="cb6-69"><a href="#cb6-69"></a>S.region &lt;-<span class="st"> </span><span class="kw">as.integer</span>(number_zones_per_region)</span>
+<span id="cb6-70"><a href="#cb6-70"></a>C &lt;-<span class="st"> </span><span class="kw">length</span>(countries)</span>
+<span id="cb6-71"><a href="#cb6-71"></a>R &lt;-<span class="st"> </span><span class="kw">length</span>(regions)</span>
+<span id="cb6-72"><a href="#cb6-72"></a></span>
+<span id="cb6-73"><a href="#cb6-73"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(S.country) <span class="op">==</span><span class="st"> </span>C)</span>
+<span id="cb6-74"><a href="#cb6-74"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(S.region) <span class="op">==</span><span class="st"> </span>R)</span>
+<span id="cb6-75"><a href="#cb6-75"></a><span class="kw">stopifnot</span>(<span class="kw">sum</span>(S.country) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(zones))</span>
+<span id="cb6-76"><a href="#cb6-76"></a><span class="kw">stopifnot</span>(<span class="kw">sum</span>(S.region) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(zones))</span>
+<span id="cb6-77"><a href="#cb6-77"></a></span>
+<span id="cb6-78"><a href="#cb6-78"></a><span class="co"># look-up vectors for survey data</span></span>
+<span id="cb6-79"><a href="#cb6-79"></a>X &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb6-80"><a href="#cb6-80"></a>X<span class="op">$</span>Y &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>year, years)</span>
+<span id="cb6-81"><a href="#cb6-81"></a>X<span class="op">$</span>S &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>zone, zones)</span>
+<span id="cb6-82"><a href="#cb6-82"></a>X<span class="op">$</span>C &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>country, countries)</span>
+<span id="cb6-83"><a href="#cb6-83"></a>X<span class="op">$</span>R &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>subregion, regions)</span>
+<span id="cb6-84"><a href="#cb6-84"></a></span>
+<span id="cb6-85"><a href="#cb6-85"></a><span class="co"># check numbers match</span></span>
+<span id="cb6-86"><a href="#cb6-86"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>C) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>country)[countries]))</span>
+<span id="cb6-87"><a href="#cb6-87"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>R) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>subregion)[regions]))</span>
+<span id="cb6-88"><a href="#cb6-88"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>S) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>zone)[zones]))</span>
+<span id="cb6-89"><a href="#cb6-89"></a></span>
+<span id="cb6-90"><a href="#cb6-90"></a><span class="co"># check again</span></span>
+<span id="cb6-91"><a href="#cb6-91"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(dat)) {</span>
+<span id="cb6-92"><a href="#cb6-92"></a></span>
+<span id="cb6-93"><a href="#cb6-93"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>country[i] <span class="op">==</span><span class="st"> </span>countries[X<span class="op">$</span>C[i]])</span>
+<span id="cb6-94"><a href="#cb6-94"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>zone[i] <span class="op">==</span><span class="st"> </span>zones[X<span class="op">$</span>S[i]])</span>
+<span id="cb6-95"><a href="#cb6-95"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>subregion[i] <span class="op">==</span><span class="st"> </span>regions[X<span class="op">$</span>R[i]])</span>
+<span id="cb6-96"><a href="#cb6-96"></a>}</span>
+<span id="cb6-97"><a href="#cb6-97"></a></span>
+<span id="cb6-98"><a href="#cb6-98"></a><span class="co"># check</span></span>
+<span id="cb6-99"><a href="#cb6-99"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>years[X<span class="op">$</span>Y]))</span>
+<span id="cb6-100"><a href="#cb6-100"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>zone <span class="op">==</span><span class="st"> </span>zones[X<span class="op">$</span>S]))</span>
+<span id="cb6-101"><a href="#cb6-101"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>country <span class="op">==</span><span class="st"> </span>countries[X<span class="op">$</span>C]))</span>
+<span id="cb6-102"><a href="#cb6-102"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>subregion <span class="op">==</span><span class="st"> </span>regions[X<span class="op">$</span>R]))</span>
+<span id="cb6-103"><a href="#cb6-103"></a></span>
+<span id="cb6-104"><a href="#cb6-104"></a><span class="co"># make area sizes</span></span>
+<span id="cb6-105"><a href="#cb6-105"></a>areas &lt;-<span class="st"> </span><span class="kw">merge</span>(<span class="kw">expand.grid</span>(<span class="dt">year =</span> years, <span class="dt">zone =</span> zones), dat[, <span class="kw">c</span>(<span class="st">&quot;year&quot;</span>, <span class="st">&quot;zone&quot;</span>, <span class="st">&quot;survey_area&quot;</span>)],</span>
+<span id="cb6-106"><a href="#cb6-106"></a>    <span class="dt">all =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb6-107"><a href="#cb6-107"></a>areas &lt;-<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">acast</span>(areas, year <span class="op">~</span><span class="st"> </span>zone, <span class="dt">fun.aggregate =</span> <span class="cf">function</span>(x) <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</span>
+<span id="cb6-108"><a href="#cb6-108"></a>    <span class="dt">value.var =</span> <span class="st">&quot;survey_area&quot;</span>, <span class="dt">fill =</span> <span class="kw">as.numeric</span>(<span class="ot">NA</span>), <span class="dt">drop =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb6-109"><a href="#cb6-109"></a></span>
+<span id="cb6-110"><a href="#cb6-110"></a>areas &lt;-<span class="st"> </span><span class="kw">apply</span>(areas, <span class="dv">2</span>, redData<span class="op">::</span>fill, <span class="dt">complete =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb6-111"><a href="#cb6-111"></a></span>
+<span id="cb6-112"><a href="#cb6-112"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">colnames</span>(areas) <span class="op">==</span><span class="st"> </span>zones))</span>
+<span id="cb6-113"><a href="#cb6-113"></a></span>
+<span id="cb6-114"><a href="#cb6-114"></a><span class="co"># get modal areas per zone</span></span>
+<span id="cb6-115"><a href="#cb6-115"></a>modal_areas &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">zone =</span> dat<span class="op">$</span>zone, <span class="dt">modal_survey_area =</span> dat<span class="op">$</span>modal_survey_area)[<span class="op">!</span><span class="kw">duplicated</span>(<span class="kw">data.frame</span>(dat<span class="op">$</span>zone,</span>
+<span id="cb6-116"><a href="#cb6-116"></a>    dat<span class="op">$</span>modal_survey_area)), ]</span>
+<span id="cb6-117"><a href="#cb6-117"></a>modal_areas &lt;-<span class="st"> </span>modal_areas[<span class="kw">match</span>(zones, modal_areas<span class="op">$</span>zone), ]</span>
+<span id="cb6-118"><a href="#cb6-118"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(modal_areas<span class="op">$</span>zone <span class="op">==</span><span class="st"> </span>zones))</span>
+<span id="cb6-119"><a href="#cb6-119"></a><span class="kw">stopifnot</span>(<span class="kw">nrow</span>(modal_areas) <span class="op">==</span><span class="st"> </span>S)</span>
+<span id="cb6-120"><a href="#cb6-120"></a></span>
+<span id="cb6-121"><a href="#cb6-121"></a>modal_areas<span class="op">$</span>max_modal_survey_area &lt;-<span class="st"> </span><span class="kw">numeric</span>(S)</span>
+<span id="cb6-122"><a href="#cb6-122"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>S) {</span>
+<span id="cb6-123"><a href="#cb6-123"></a>    modal_areas<span class="op">$</span>max_modal_survey_area[i] &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">as.numeric</span>(<span class="kw">unlist</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(modal_areas[i,</span>
+<span id="cb6-124"><a href="#cb6-124"></a>        <span class="dv">2</span>]), <span class="st">&quot;;&quot;</span>))))</span>
+<span id="cb6-125"><a href="#cb6-125"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># save regression input data</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>reg_dat_savannah &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">N =</span> N, <span class="dt">Y =</span> Y, <span class="dt">S =</span> <span class="kw">list</span>(<span class="dt">global =</span> S, <span class="dt">by_region =</span> S.region, <span class="dt">by_country =</span> S.country),</span>
+<span id="cb7-3"><a href="#cb7-3"></a>    <span class="dt">C =</span> C, <span class="dt">R =</span> R, <span class="dt">XY =</span> X<span class="op">$</span>Y, <span class="dt">XC =</span> X<span class="op">$</span>C, <span class="dt">XS =</span> X<span class="op">$</span>S, <span class="dt">XR =</span> X<span class="op">$</span>R, <span class="dt">y =</span> dat<span class="op">$</span>estimate, <span class="dt">survey_area =</span> <span class="kw">t</span>(areas),</span>
+<span id="cb7-4"><a href="#cb7-4"></a>    <span class="dt">years =</span> year_labels, <span class="dt">regions =</span> regions, <span class="dt">countries =</span> countries, <span class="dt">sites =</span> zones)</span>
+<span id="cb7-5"><a href="#cb7-5"></a></span>
+<span id="cb7-6"><a href="#cb7-6"></a>dat_savannah &lt;-<span class="st"> </span>dat</span>
+<span id="cb7-7"><a href="#cb7-7"></a></span>
+<span id="cb7-8"><a href="#cb7-8"></a>usethis<span class="op">::</span><span class="kw">use_data</span>(reg_dat_savannah, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb7-9"><a href="#cb7-9"></a>usethis<span class="op">::</span><span class="kw">use_data</span>(dat_savannah, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="global" class="section level1">
+<h1>Global</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>dat &lt;-<span class="st"> </span>dat_global</span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co"># start of model in year before first data year</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>year_start &lt;-<span class="st"> </span><span class="kw">min</span>(dat<span class="op">$</span>year) <span class="op">-</span><span class="st"> </span>1L</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># year labels for plotting</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>dat<span class="op">$</span>year_label &lt;-<span class="st"> </span>dat<span class="op">$</span>year</span>
+<span id="cb9-3"><a href="#cb9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co"># year = 0 corresponds to start of model</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a>dat<span class="op">$</span>year &lt;-<span class="st"> </span>dat<span class="op">$</span>year <span class="op">-</span><span class="st"> </span>year_start</span>
+<span id="cb9-6"><a href="#cb9-6"></a></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co"># data years all &gt; 0</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>year <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>))</span>
+<span id="cb9-9"><a href="#cb9-9"></a></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co"># year covariate</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>years &lt;-<span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="kw">max</span>(dat<span class="op">$</span>year)</span>
+<span id="cb9-12"><a href="#cb9-12"></a>year_labels &lt;-<span class="st"> </span>year_start<span class="op">:</span><span class="kw">max</span>(dat<span class="op">$</span>year_label)</span>
+<span id="cb9-13"><a href="#cb9-13"></a></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(years) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(year_labels))</span>
+<span id="cb9-15"><a href="#cb9-15"></a></span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="co"># zones for each country and region</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a>number_zones_per_country &lt;-<span class="st"> </span><span class="kw">apply</span>(<span class="kw">with</span>(dat, <span class="kw">table</span>(country, zone) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>), <span class="dv">1</span>, sum)</span>
+<span id="cb9-18"><a href="#cb9-18"></a>number_zones_per_region &lt;-<span class="st"> </span><span class="kw">apply</span>(<span class="kw">with</span>(dat, <span class="kw">table</span>(subregion, zone) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>), <span class="dv">1</span>, sum)</span>
+<span id="cb9-19"><a href="#cb9-19"></a></span>
+<span id="cb9-20"><a href="#cb9-20"></a>zones_per_country &lt;-<span class="st"> </span><span class="kw">dlply</span>(dat, .(country), summarize, <span class="dt">zones =</span> <span class="kw">as.character</span>(<span class="kw">unique</span>(zone)))</span>
+<span id="cb9-21"><a href="#cb9-21"></a>zones_per_country &lt;-<span class="st"> </span><span class="kw">lapply</span>(zones_per_country, <span class="cf">function</span>(x) x[, <span class="dv">1</span>])</span>
+<span id="cb9-22"><a href="#cb9-22"></a></span>
+<span id="cb9-23"><a href="#cb9-23"></a>zones_per_region &lt;-<span class="st"> </span><span class="kw">dlply</span>(dat, .(subregion, country), summarize, <span class="dt">zones =</span> <span class="kw">as.character</span>(<span class="kw">unique</span>(zone)))</span>
+<span id="cb9-24"><a href="#cb9-24"></a>zones_per_region &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(number_zones_per_region), <span class="cf">function</span>(x) <span class="kw">as.character</span>(<span class="kw">unlist</span>(zones_per_region[<span class="kw">grep</span>(x,</span>
+<span id="cb9-25"><a href="#cb9-25"></a>    <span class="kw">names</span>(zones_per_region))])))</span>
+<span id="cb9-26"><a href="#cb9-26"></a><span class="kw">names</span>(zones_per_region) &lt;-<span class="st"> </span><span class="kw">names</span>(number_zones_per_region)</span>
+<span id="cb9-27"><a href="#cb9-27"></a></span>
+<span id="cb9-28"><a href="#cb9-28"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">names</span>(zones_per_country) <span class="op">==</span><span class="st"> </span><span class="kw">names</span>(number_zones_per_country)))</span>
+<span id="cb9-29"><a href="#cb9-29"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(number_zones_per_country <span class="op">==</span><span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(zones_per_country, length))))</span>
+<span id="cb9-30"><a href="#cb9-30"></a></span>
+<span id="cb9-31"><a href="#cb9-31"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">names</span>(zones_per_region) <span class="op">==</span><span class="st"> </span><span class="kw">names</span>(number_zones_per_region)))</span>
+<span id="cb9-32"><a href="#cb9-32"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(number_zones_per_region <span class="op">==</span><span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(zones_per_region, length))))</span>
+<span id="cb9-33"><a href="#cb9-33"></a></span>
+<span id="cb9-34"><a href="#cb9-34"></a><span class="co"># order data by subregion, country then zone</span></span>
+<span id="cb9-35"><a href="#cb9-35"></a>dat &lt;-<span class="st"> </span>dat[<span class="kw">order</span>(dat<span class="op">$</span>subregion, dat<span class="op">$</span>country, dat<span class="op">$</span>zone), ]</span>
+<span id="cb9-36"><a href="#cb9-36"></a></span>
+<span id="cb9-37"><a href="#cb9-37"></a><span class="co"># extract vector of countries</span></span>
+<span id="cb9-38"><a href="#cb9-38"></a>countries &lt;-<span class="st"> </span><span class="kw">names</span>(zones_per_country)</span>
+<span id="cb9-39"><a href="#cb9-39"></a></span>
+<span id="cb9-40"><a href="#cb9-40"></a><span class="co"># extract regions</span></span>
+<span id="cb9-41"><a href="#cb9-41"></a>regions &lt;-<span class="st"> </span><span class="kw">names</span>(zones_per_region)</span>
+<span id="cb9-42"><a href="#cb9-42"></a></span>
+<span id="cb9-43"><a href="#cb9-43"></a><span class="co"># check that order of zones in &#39;zones_per_country&#39; matches the ordering of the zones in &#39;dat&#39;</span></span>
+<span id="cb9-44"><a href="#cb9-44"></a><span class="cf">for</span> (i <span class="cf">in</span> countries) {</span>
+<span id="cb9-45"><a href="#cb9-45"></a></span>
+<span id="cb9-46"><a href="#cb9-46"></a>    tmp &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, country <span class="op">==</span><span class="st"> </span>i)</span>
+<span id="cb9-47"><a href="#cb9-47"></a></span>
+<span id="cb9-48"><a href="#cb9-48"></a>    <span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone) <span class="op">==</span><span class="st"> </span>zones_per_country[[i]]))</span>
+<span id="cb9-49"><a href="#cb9-49"></a>    <span class="kw">stopifnot</span>(<span class="kw">length</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone)) <span class="op">==</span><span class="st"> </span>number_zones_per_country[i])</span>
+<span id="cb9-50"><a href="#cb9-50"></a>}</span>
+<span id="cb9-51"><a href="#cb9-51"></a></span>
+<span id="cb9-52"><a href="#cb9-52"></a><span class="co"># check that order of zones in &#39;zones_per_region&#39; matches the ordering of the zones in &#39;dat&#39;</span></span>
+<span id="cb9-53"><a href="#cb9-53"></a><span class="cf">for</span> (i <span class="cf">in</span> regions) {</span>
+<span id="cb9-54"><a href="#cb9-54"></a></span>
+<span id="cb9-55"><a href="#cb9-55"></a>    tmp &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, subregion <span class="op">==</span><span class="st"> </span>i)</span>
+<span id="cb9-56"><a href="#cb9-56"></a></span>
+<span id="cb9-57"><a href="#cb9-57"></a>    <span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone) <span class="op">==</span><span class="st"> </span>zones_per_region[[i]]))</span>
+<span id="cb9-58"><a href="#cb9-58"></a>    <span class="kw">stopifnot</span>(<span class="kw">length</span>(<span class="kw">unique</span>(tmp<span class="op">$</span>zone)) <span class="op">==</span><span class="st"> </span>number_zones_per_region[i])</span>
+<span id="cb9-59"><a href="#cb9-59"></a>}</span>
+<span id="cb9-60"><a href="#cb9-60"></a></span>
+<span id="cb9-61"><a href="#cb9-61"></a><span class="co"># extract ordered vector of zones</span></span>
+<span id="cb9-62"><a href="#cb9-62"></a>zones &lt;-<span class="st"> </span><span class="kw">unique</span>(dat<span class="op">$</span>zone)</span>
+<span id="cb9-63"><a href="#cb9-63"></a></span>
+<span id="cb9-64"><a href="#cb9-64"></a><span class="co"># dimensions</span></span>
+<span id="cb9-65"><a href="#cb9-65"></a>N &lt;-<span class="st"> </span><span class="kw">nrow</span>(dat)</span>
+<span id="cb9-66"><a href="#cb9-66"></a>Y &lt;-<span class="st"> </span><span class="kw">length</span>(years)</span>
+<span id="cb9-67"><a href="#cb9-67"></a>S &lt;-<span class="st"> </span><span class="kw">length</span>(zones)</span>
+<span id="cb9-68"><a href="#cb9-68"></a>S.country &lt;-<span class="st"> </span><span class="kw">as.integer</span>(number_zones_per_country)</span>
+<span id="cb9-69"><a href="#cb9-69"></a>S.region &lt;-<span class="st"> </span><span class="kw">as.integer</span>(number_zones_per_region)</span>
+<span id="cb9-70"><a href="#cb9-70"></a>C &lt;-<span class="st"> </span><span class="kw">length</span>(countries)</span>
+<span id="cb9-71"><a href="#cb9-71"></a>R &lt;-<span class="st"> </span><span class="kw">length</span>(regions)</span>
+<span id="cb9-72"><a href="#cb9-72"></a></span>
+<span id="cb9-73"><a href="#cb9-73"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(S.country) <span class="op">==</span><span class="st"> </span>C)</span>
+<span id="cb9-74"><a href="#cb9-74"></a><span class="kw">stopifnot</span>(<span class="kw">length</span>(S.region) <span class="op">==</span><span class="st"> </span>R)</span>
+<span id="cb9-75"><a href="#cb9-75"></a><span class="kw">stopifnot</span>(<span class="kw">sum</span>(S.country) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(zones))</span>
+<span id="cb9-76"><a href="#cb9-76"></a><span class="kw">stopifnot</span>(<span class="kw">sum</span>(S.region) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(zones))</span>
+<span id="cb9-77"><a href="#cb9-77"></a></span>
+<span id="cb9-78"><a href="#cb9-78"></a><span class="co"># look-up vectors for survey data</span></span>
+<span id="cb9-79"><a href="#cb9-79"></a>X &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb9-80"><a href="#cb9-80"></a>X<span class="op">$</span>Y &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>year, years)</span>
+<span id="cb9-81"><a href="#cb9-81"></a>X<span class="op">$</span>S &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>zone, zones)</span>
+<span id="cb9-82"><a href="#cb9-82"></a>X<span class="op">$</span>C &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>country, countries)</span>
+<span id="cb9-83"><a href="#cb9-83"></a>X<span class="op">$</span>R &lt;-<span class="st"> </span><span class="kw">match</span>(dat<span class="op">$</span>subregion, regions)</span>
+<span id="cb9-84"><a href="#cb9-84"></a></span>
+<span id="cb9-85"><a href="#cb9-85"></a><span class="co"># check numbers match</span></span>
+<span id="cb9-86"><a href="#cb9-86"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>C) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>country)[countries]))</span>
+<span id="cb9-87"><a href="#cb9-87"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>R) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>subregion)[regions]))</span>
+<span id="cb9-88"><a href="#cb9-88"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">table</span>(X<span class="op">$</span>S) <span class="op">==</span><span class="st"> </span><span class="kw">table</span>(dat<span class="op">$</span>zone)[zones]))</span>
+<span id="cb9-89"><a href="#cb9-89"></a></span>
+<span id="cb9-90"><a href="#cb9-90"></a><span class="co"># check again</span></span>
+<span id="cb9-91"><a href="#cb9-91"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(dat)) {</span>
+<span id="cb9-92"><a href="#cb9-92"></a></span>
+<span id="cb9-93"><a href="#cb9-93"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>country[i] <span class="op">==</span><span class="st"> </span>countries[X<span class="op">$</span>C[i]])</span>
+<span id="cb9-94"><a href="#cb9-94"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>zone[i] <span class="op">==</span><span class="st"> </span>zones[X<span class="op">$</span>S[i]])</span>
+<span id="cb9-95"><a href="#cb9-95"></a>    <span class="kw">stopifnot</span>(dat<span class="op">$</span>subregion[i] <span class="op">==</span><span class="st"> </span>regions[X<span class="op">$</span>R[i]])</span>
+<span id="cb9-96"><a href="#cb9-96"></a>}</span>
+<span id="cb9-97"><a href="#cb9-97"></a></span>
+<span id="cb9-98"><a href="#cb9-98"></a><span class="co"># check</span></span>
+<span id="cb9-99"><a href="#cb9-99"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>years[X<span class="op">$</span>Y]))</span>
+<span id="cb9-100"><a href="#cb9-100"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>zone <span class="op">==</span><span class="st"> </span>zones[X<span class="op">$</span>S]))</span>
+<span id="cb9-101"><a href="#cb9-101"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>country <span class="op">==</span><span class="st"> </span>countries[X<span class="op">$</span>C]))</span>
+<span id="cb9-102"><a href="#cb9-102"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(dat<span class="op">$</span>subregion <span class="op">==</span><span class="st"> </span>regions[X<span class="op">$</span>R]))</span>
+<span id="cb9-103"><a href="#cb9-103"></a></span>
+<span id="cb9-104"><a href="#cb9-104"></a><span class="co"># make area sizes</span></span>
+<span id="cb9-105"><a href="#cb9-105"></a>areas &lt;-<span class="st"> </span><span class="kw">merge</span>(<span class="kw">expand.grid</span>(<span class="dt">year =</span> years, <span class="dt">zone =</span> zones), dat[, <span class="kw">c</span>(<span class="st">&quot;year&quot;</span>, <span class="st">&quot;zone&quot;</span>, <span class="st">&quot;survey_area&quot;</span>)],</span>
+<span id="cb9-106"><a href="#cb9-106"></a>    <span class="dt">all =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb9-107"><a href="#cb9-107"></a>areas &lt;-<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">acast</span>(areas, year <span class="op">~</span><span class="st"> </span>zone, <span class="dt">fun.aggregate =</span> <span class="cf">function</span>(x) <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</span>
+<span id="cb9-108"><a href="#cb9-108"></a>    <span class="dt">value.var =</span> <span class="st">&quot;survey_area&quot;</span>, <span class="dt">fill =</span> <span class="kw">as.numeric</span>(<span class="ot">NA</span>), <span class="dt">drop =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb9-109"><a href="#cb9-109"></a></span>
+<span id="cb9-110"><a href="#cb9-110"></a>areas &lt;-<span class="st"> </span><span class="kw">apply</span>(areas, <span class="dv">2</span>, redData<span class="op">::</span>fill, <span class="dt">complete =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb9-111"><a href="#cb9-111"></a></span>
+<span id="cb9-112"><a href="#cb9-112"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(<span class="kw">colnames</span>(areas) <span class="op">==</span><span class="st"> </span>zones))</span>
+<span id="cb9-113"><a href="#cb9-113"></a></span>
+<span id="cb9-114"><a href="#cb9-114"></a><span class="co"># get modal areas per zone</span></span>
+<span id="cb9-115"><a href="#cb9-115"></a>modal_areas &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">zone =</span> dat<span class="op">$</span>zone, <span class="dt">modal_survey_area =</span> dat<span class="op">$</span>modal_survey_area)[<span class="op">!</span><span class="kw">duplicated</span>(<span class="kw">data.frame</span>(dat<span class="op">$</span>zone,</span>
+<span id="cb9-116"><a href="#cb9-116"></a>    dat<span class="op">$</span>modal_survey_area)), ]</span>
+<span id="cb9-117"><a href="#cb9-117"></a>modal_areas &lt;-<span class="st"> </span>modal_areas[<span class="kw">match</span>(zones, modal_areas<span class="op">$</span>zone), ]</span>
+<span id="cb9-118"><a href="#cb9-118"></a><span class="kw">stopifnot</span>(<span class="kw">all</span>(modal_areas<span class="op">$</span>zone <span class="op">==</span><span class="st"> </span>zones))</span>
+<span id="cb9-119"><a href="#cb9-119"></a><span class="kw">stopifnot</span>(<span class="kw">nrow</span>(modal_areas) <span class="op">==</span><span class="st"> </span>S)</span>
+<span id="cb9-120"><a href="#cb9-120"></a></span>
+<span id="cb9-121"><a href="#cb9-121"></a>modal_areas<span class="op">$</span>max_modal_survey_area &lt;-<span class="st"> </span><span class="kw">numeric</span>(S)</span>
+<span id="cb9-122"><a href="#cb9-122"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>S) {</span>
+<span id="cb9-123"><a href="#cb9-123"></a>    modal_areas<span class="op">$</span>max_modal_survey_area[i] &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">as.numeric</span>(<span class="kw">unlist</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(modal_areas[i,</span>
+<span id="cb9-124"><a href="#cb9-124"></a>        <span class="dv">2</span>]), <span class="st">&quot;;&quot;</span>))))</span>
+<span id="cb9-125"><a href="#cb9-125"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># save regression input data</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>reg_dat_global &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">N =</span> N, <span class="dt">Y =</span> Y, <span class="dt">S =</span> <span class="kw">list</span>(<span class="dt">global =</span> S, <span class="dt">by_region =</span> S.region, <span class="dt">by_country =</span> S.country),</span>
+<span id="cb10-3"><a href="#cb10-3"></a>    <span class="dt">C =</span> C, <span class="dt">R =</span> R, <span class="dt">XY =</span> X<span class="op">$</span>Y, <span class="dt">XC =</span> X<span class="op">$</span>C, <span class="dt">XS =</span> X<span class="op">$</span>S, <span class="dt">XR =</span> X<span class="op">$</span>R, <span class="dt">y =</span> dat<span class="op">$</span>estimate, <span class="dt">survey_area =</span> <span class="kw">t</span>(areas),</span>
+<span id="cb10-4"><a href="#cb10-4"></a>    <span class="dt">years =</span> year_labels, <span class="dt">regions =</span> regions, <span class="dt">countries =</span> countries, <span class="dt">sites =</span> zones)</span>
+<span id="cb10-5"><a href="#cb10-5"></a></span>
+<span id="cb10-6"><a href="#cb10-6"></a>dat_global &lt;-<span class="st"> </span>dat</span>
+<span id="cb10-7"><a href="#cb10-7"></a></span>
+<span id="cb10-8"><a href="#cb10-8"></a>usethis<span class="op">::</span><span class="kw">use_data</span>(reg_dat_global, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb10-9"><a href="#cb10-9"></a>usethis<span class="op">::</span><span class="kw">use_data</span>(dat_global, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

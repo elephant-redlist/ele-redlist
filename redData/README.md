@@ -1,7 +1,7 @@
 African Elephant Red List Assessment (data)  <img src='african-elephant.jpg' align="right" height="120" />
 ===========================================
 
-The `redData` R-package contains the data and cleaning scripts to accompany the `red` [package](https://github.com/elephant-redlist/ele-redlist/red).
+The `redData` R-package contains the data and cleaning scripts to accompany the `red` [package](https://github.com/elephant-redlist/ele-redlist/tree/master/red).
 
 For permission to access the data please fill in the [Data Request Form](https://forms.gle/S1FBWAon51f4rZKE8). For enquiries, please contact the [AERL team](mailto:redlist.africanelephants@gmail.com).
 

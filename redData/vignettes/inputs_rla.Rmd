@@ -28,7 +28,7 @@ Load data and subset:
 ```{r}
 data(AED)
 
-dat_global <- AED[, c('region', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys')]
+dat_global <- AED[, c('region', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys', 'delete')]
 
 # only use data up to 2015
 dat_global <- subset(dat_global, year < 2016)

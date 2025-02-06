@@ -28,10 +28,13 @@ Load data and subset.
 ```{r}
 data(AED)
 
-dat_global <- AED[, c('region', 'subregion', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys')]
+dat_global <- AED[, c('region', 'subregion', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'raw_density', 'n_surveys')]
 ```
 
 ```{r, echo = FALSE}
+dat_global$density <- dat_global$raw_density
+dat_global$raw_density <- NULL
+
 # clean out two records with unusually high survey areas
 
 # raw data record to be deleted:

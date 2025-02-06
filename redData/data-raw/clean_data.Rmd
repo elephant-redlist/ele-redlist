@@ -131,6 +131,11 @@ for (i in countries) {
     
     dfr$revised_density <- dfr$estimate / dfr$revised_survey_area
     
+    # mark for deletion
+    dfr$raw_density <- dfr$density
+    dfr$revised_density[is.na(dfr$delete_revised)] <- NA
+    dfr$density[is.na(dfr$delete)] <- NA
+    
     # count number surveys per zone
     dfr.tmp <- ddply(dfr, .(zone), summarize, n_surveys = length(density))
     dfr     <- merge(dfr, dfr.tmp, by = "zone", all = TRUE)

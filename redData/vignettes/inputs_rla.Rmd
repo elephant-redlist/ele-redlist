@@ -28,7 +28,7 @@ Load data and subset:
 ```{r}
 data(AED)
 
-dat_global <- AED[, c('region', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys', 'delete')]
+dat_global <- AED[, c('region', 'country', 'year', 'zone', 'estimate', 'survey_area', 'modal_survey_area', 'density', 'n_surveys')]
 
 # only use data up to 2015
 dat_global <- subset(dat_global, year < 2016)
@@ -36,7 +36,6 @@ dat_global <- subset(dat_global, year < 2016)
 
 Delete surveys with extreme area sizes:
 ```{r}
-dat_global$density[dat_global$delete] <- NA
 dat_global <- subset(dat_global, !is.na(density))
 ```
 

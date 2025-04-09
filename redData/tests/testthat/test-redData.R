@@ -15,22 +15,27 @@ test_that("check 'AED'", {
     dfr2 <- dat_v1.1.5 %>% group_by(zone) %>% summarise(n_1.1.5 = n()) 
     dfr <- full_join(dfr1, dfr2, by = "zone")
     dfr$match <- dfr$n_0.0.4 == dfr$n_1.1.5
-    expect_false(nrow(filter(dfr, !match)) > 0)
+    expect_false(nrow(filter(dfr, !match | is.na(match))) > 0)
 })
 
 test_that("check 'forest'", {
     
     load("data-v0.0.4/forest.rda")
+    
+    # accent not removed from "Mont Tingui and Kinkené" 
+    # leading to duplication of zone
+    dat$zone[grep("Mont Tingui", dat$zone)] <- "Mont Tingui and Kinkene"
+    
     dat_v0.0.4 <- dat; rm(dat)
     
     data("forest", package = "redData", lib.loc = Sys.getenv("R_LIBS_USER"))
-    dat_v1.1.5 <- dat
+    dat_v1.1.5 <- dat; rm(dat)
     
     dfr1 <- dat_v0.0.4 %>% group_by(zone) %>% summarise(n_0.0.4 = n())
     dfr2 <- dat_v1.1.5 %>% group_by(zone) %>% summarise(n_1.1.5 = n()) 
     dfr <- full_join(dfr1, dfr2, by = "zone")
     dfr$match <- dfr$n_0.0.4 == dfr$n_1.1.5
-    expect_false(nrow(filter(dfr, !match)) > 0)
+    expect_false(nrow(filter(dfr, !match | is.na(match))) > 0)
 })
 
 test_that("check 'savannah'", {
@@ -45,7 +50,7 @@ test_that("check 'savannah'", {
     dfr2 <- dat_v1.1.5 %>% group_by(zone) %>% summarise(n_1.1.5 = n()) 
     dfr <- full_join(dfr1, dfr2, by = "zone")
     dfr$match <- dfr$n_0.0.4 == dfr$n_1.1.5
-    expect_false(nrow(filter(dfr, !match)) > 0)
+    expect_false(nrow(filter(dfr, !match | is.na(match))) > 0)
 })
 
 

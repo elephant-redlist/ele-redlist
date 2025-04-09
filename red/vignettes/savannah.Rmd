@@ -19,9 +19,12 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 suppressPackageStartupMessages(library(rstan))
 suppressPackageStartupMessages(library(ggplot2))
-options(mc.cores = parallel::detectCores())
 suppressPackageStartupMessages(library(pander))
 suppressPackageStartupMessages(library(plyr))
+```
+
+```{r}
+stopifnot(utils::packageVersion("redData") == "1.1.5")
 ```
 
 Load the package and extract stan model code
@@ -61,7 +64,7 @@ reg_ini$tau     <- c(0.1,0.1)
 
 ```{r, results = 'hide'}
 # MCMC sampling
-reg_ll_out <- sampling(reg_ll, data = savannah, init = function() reg_ini, chains = 2) 
+reg_ll_out <- sampling(reg_ll, data = savannah, init = function() reg_ini, chains = 2, cores = 2) 
 ```
 
 ```{r, echo = FALSE, fig.width=10, fig.height=10}

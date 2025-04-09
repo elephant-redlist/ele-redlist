@@ -1,3 +1,8 @@
+test_that("check package verion", {
+    
+    expect_true(utils::packageVersion("redData") == "1.1.5")
+})
+
 test_that("check 'AED'", {
     
     load("data-v0.0.4/AED.rda")

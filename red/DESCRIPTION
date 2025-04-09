@@ -23,7 +23,7 @@ Depends:
 Imports:
     methods
 Remotes:
-    cttedwards/redData
+    elephant-redlist/ele-redlist/redData
 Collate: 
     'diagnostics.R'
     'label.R'
@@ -36,4 +36,5 @@ Collate:
     'versionUpdate.R'
     'waic.R'
     'zzz.R'
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
+Encoding: UTF-8

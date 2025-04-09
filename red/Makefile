@@ -1,38 +1,25 @@
 # Makefile for generating the red R package
-#
-PKG_VERSION=$(shell grep -i ^version DESCRIPTION | cut -d : -d \  -f 2)
-PKG_NAME=$(shell grep -i ^package DESCRIPTION | cut -d : -d \  -f 2)
-R_FILES := $(wildcard R/*.R)
-STAN_FILES := $(wildcard stan/*.stan)
-PKG_FILES := DESCRIPTION NAMESPACE $(R_FILES) $(STAN_FILES)
 
-ifeq ($(OS),Windows_NT) 
-	RM = rm -rf
-	CP = cp -f
-	CD = cd
-else
-	RM = rm -rf
-	CP = cp -f
-	CD = cd
-endif
+PKGNAME = `sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION`
+PKGVERS = `sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION`
 
-#all: document install clean
+.PHONY: all
 
-#./inst/doc/*.html: ./vignettes/*.Rmd
-#	$(CD) vignettes; Rcmd Sweave forest.Rmd; Rcmd Sweave savannah.Rmd
-#	$(CP) ./vignettes/*.html ./inst/doc/
+all: install
+
+build: install_deps
+	R CMD build .
+
+install_deps: install_man
+	Rscript \
+	-e 'if (!requireNamespace("remotes")) install.packages("remotes")' \
+	-e 'remotes::install_deps(dependencies = TRUE)'
     
-install: $(PKG_FILES)
-	$(RM) $(PKG_NAME)_*.tar.gz
-	Rcmd build --no-build-vignettes .
-	Rcmd INSTALL $(PKG_NAME)_*.tar.gz
-	
-DESCRIPTION NAMESPACE: $(R_FILES)
-	Rscript version_update.R
+install_man:
+	Rscript \
+	-e 'if (!requireNamespace("roxygen2")) install.packages("roxygen2")' \
+	-e 'roxygen2::roxygenize()'
 
-clean:
-	$(RM) $(PKG_NAME)_*.zip
-	$(RM) $(PKG_NAME)_*.tar.gz
-	$(RM) man/
-	$(RM) vignettes/*.html
-	$(RM) vignettes/*.R
+install: build
+	R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
+

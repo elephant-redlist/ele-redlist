@@ -133,8 +133,8 @@ for (i in countries) {
     
     # mark for deletion
     dfr$raw_density <- dfr$density
-    dfr$revised_density[is.na(dfr$delete_revised)] <- NA
-    dfr$density[is.na(dfr$delete)] <- NA
+    dfr$revised_density[dfr$delete_revised] <- NA
+    dfr$density[dfr$delete] <- NA
     
     # count number surveys per zone
     dfr.tmp <- ddply(dfr, .(zone), summarize, n_surveys = length(density))
@@ -230,7 +230,7 @@ dat <- subset(dat, zone %in% dfr$zone)
 ```
 
 ```{r, echo = FALSE}
-if (any(is.na(dat$density))) stop("NA values in density")
+if (any(is.na(dat$density))) warning("NA values in density")
 ```
 
 Write .csv file

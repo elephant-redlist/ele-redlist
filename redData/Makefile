@@ -5,10 +5,12 @@ PKGVERS = `sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION`
 
 .PHONY: all
 
-all: data install
+all: data install test
 
 build: install_deps
 	R CMD build .
+	
+test:
 	Rscript -e "library(dplyr); library(devtools); test()"
 
 check: build

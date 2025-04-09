@@ -21,7 +21,9 @@ suppressPackageStartupMessages(library(rstan))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(pander))
 suppressPackageStartupMessages(library(plyr))
+```
 
+```{r}
 stopifnot(utils::packageVersion("redData") == "1.1.5")
 ```
 

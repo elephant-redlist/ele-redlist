@@ -12,7 +12,6 @@ VignetteBuilder: knitr
 Depends:
     R (>= 4.0.2),
 Suggests:
-    markdown,
     rmarkdown (>= 2.6),
     knitr (>= 1.31),
     ggplot2 (>= 3.3.3),

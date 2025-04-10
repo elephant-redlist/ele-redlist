@@ -50,11 +50,6 @@ year_start <- 1974
 year_N0    <- 1984
 ```
 
-```{r, echo = FALSE}
-# for some reason this site doesn't work
-dat <- subset(dat, zone != "MPD area")
-```
-
 ```{r}
 # year labels for plotting
 dat$year_label <- dat$year
@@ -73,6 +68,9 @@ stopifnot(length(years) == length(year_labels))
 # start year
 start <- as.integer(match(year_N0, year_labels))
 
+# order data by country then zone
+dat <- dat[order(dat$country, dat$zone),]
+
 # zones for each country
 number_zones_per_country <- apply(with(dat, table(country, zone) > 0), 1, sum)
 
@@ -81,9 +79,6 @@ zones_per_country <- lapply(zones_per_country, function(x) x[,1])
 
 stopifnot(all(names(zones_per_country) == names(number_zones_per_country)))
 stopifnot(all(number_zones_per_country == unlist(lapply(zones_per_country, length))))
-
-# order data by country then zone
-dat <- dat[order(dat$country, dat$zone),]
 
 # extract vector of countries
 countries <- names(zones_per_country)

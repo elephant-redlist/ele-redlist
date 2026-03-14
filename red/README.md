@@ -4,10 +4,10 @@ African Elephant Red List Assessment (model)  <img src='african-elephant.jpg' al
 The `red` R-package fits a regression based population dynamics model to elephant survey data and generates outputs suitable for the IUCN Redlist clasification scheme. 
 
 ## Installation
-This package has been built using `R >= 4.1.0`. First install `rstan` and then the `redData` [package](https://github.com/elephant-redlist/ele-redlist/tree/master/redData). To install the `red` package we recommend using the `remotes` package and executing the following command from within an active R session:
+This package has been built using `R >= 4.1.0`. First install `rstan` and then the `redData` [package](https://github.com/elephant-redlist/ele-redlist/tree/master/redData). Note that access to the data requires the appropriate permissions. To install the `red` package we recommend using the `remotes` package and executing the following command from within an active R session:
 
-`remotes::install_github('elephant-redlist/ele-redlist/red', dependencies = TRUE, build_vignettes = TRUE)`
+`remotes::install_github('elephant-redlist/ele-redlist/red', dependencies = TRUE, build_vignettes = TRUE, force = TRUE)`
 
-Scripts used to run the model are available as package vignettes, which can be viewed using:
+Setting `force = TRUE` ensures that an updated version of `redData` is installed. Scripts used to run the model are available as package vignettes, which can be viewed using:
 
 `browseVignettes(package = "red")`

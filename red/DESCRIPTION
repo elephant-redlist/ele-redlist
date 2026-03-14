@@ -20,7 +20,7 @@ Suggests:
 Depends:
     R (>= 4.0.0),
 	rstan (>= 2.21.0),
-	redData
+	redData (>= 1.1.5)
 Imports:
     methods
 Remotes:
